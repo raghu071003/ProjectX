@@ -4,9 +4,13 @@ import authRouter from "./routes/auth.routes.js";
 import skillsRouter from "./routes/skills.routes.js";
 import submissionRoutes from "./routes/submission.routes.js";
 import recommendationRoutes from "./routes/recommendation.routes.js";
+import cors from "cors";
+import corsConfig from "./config/corsConfig.js";    
 
 const app = express();
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cors(corsConfig));
 connectDB();
 
 
