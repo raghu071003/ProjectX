@@ -1,3 +1,4 @@
+import UserSkillState from "../models/UserSkillState.js";
 import { getUserSkills } from "../services/skills.service.js";
 
 const getMySkills = async (req, res, next) => {
@@ -8,4 +9,18 @@ const getMySkills = async (req, res, next) => {
     next(err);
   }
 };
-export {getMySkills};
+
+const getSkillTrend = async (req, res) => {
+  const { skillKey } = req.params;
+
+  const skill = await UserSkillState.findOne({
+    userId: req.user.id,
+    skillKey
+  });
+
+  res.json({
+    trend: skill.masteryHistory
+  });
+};
+
+export {getMySkills,getSkillTrend};

@@ -14,6 +14,13 @@ const userSkillStateSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
+  masteryHistory: [
+  {
+    mastery: Number,
+    date: { type: Date, default: Date.now }
+  }
+]
+,
   attempts: {
     type: Number,
     default: 0

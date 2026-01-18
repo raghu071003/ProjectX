@@ -3,12 +3,14 @@ import authReducer from "./slices/authSlice.js";
 import skillsReducer from "./slices/skillsSlice.js";
 import recommendationReducer from "./slices/recommendationSlice.js";
 import submissionReducer from "./slices/submissionSlice.js";
+import mockReducer from "./slices/mockSlice.js";
 
 export const store = configureStore({
   reducer: {
     auth: authReducer,
     skills: skillsReducer,
     recommendation: recommendationReducer,
-    submission: submissionReducer
+    submission: submissionReducer,
+    mock:mockReducer
   }
 });

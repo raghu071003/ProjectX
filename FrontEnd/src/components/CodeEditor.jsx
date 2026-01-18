@@ -1,12 +1,17 @@
 import Editor from "@monaco-editor/react";
+import Button from "./Button";
+import { useState } from "react";
 
 export default function CodeEditor({
   code,
   setCode,
   language = "javascript",
+  setLanguage,
   onRun,
   loading
 }) {
+  const [toggleLangugage,setToggleLanguage] = useState(true);
+
   return (
     <div className="border rounded-lg overflow-hidden bg-[#0f172a] text-white shadow-lg">
       
@@ -17,18 +22,32 @@ export default function CodeEditor({
             Code Editor
           </span>
 
-          <span className="text-xs px-2 py-0.5 rounded bg-blue-600">
-            {language.toUpperCase()}
+          <span className="text-xs px-2 py-0.5 rounded bg-blue-600" onClick={()=>setToggleLanguage(true)}>
+            {
+            toggleLangugage ? (
+              <select
+                value={language}
+                onChange={(e) => setLanguage(e.target.value)}
+                className="bg-[#020617] text-white text-xs border border-slate-600 rounded px-1"
+              > 
+                <option value="javascript">JavaScript</option>
+                <option value="python">Python</option>
+                <option value="java">Java</option>
+              </select>
+            )
+            :
+            language
+          }
           </span>
+          
         </div>
 
-        <button
+        <Button
           onClick={onRun}
           disabled={loading}
-          className="px-4 py-1.5 text-sm font-medium rounded bg-green-600 hover:bg-green-500 disabled:opacity-50"
         >
           {loading ? "Running..." : "Run"}
-        </button>
+        </Button>
       </div>
 
       {/* Editor */}

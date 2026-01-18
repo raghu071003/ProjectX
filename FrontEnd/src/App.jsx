@@ -6,11 +6,16 @@ import Dashboard from "./pages/Dashboard.jsx";
 import Solve from "./pages/Solve.jsx";
 import ProtectedRoute from "./components/ProtectedRoute";
 import PublicRoute from "./components/PublicRoute";
+import Navbar from "./components/Navbar.jsx";
+import MockInterview from "./pages/MockInterview.jsx";
+import HomePage from "./pages/HomePage.jsx";
 
 export default function App() {
   return (
     <BrowserRouter>
+      <Navbar />
       <Routes>
+        <Route path="/" element={<HomePage />} />
         <Route
           path="/login"
           element={
@@ -26,6 +31,14 @@ export default function App() {
             <PublicRoute>
               <Register />
             </PublicRoute>
+          }
+        />
+        <Route
+          path="/mock"
+          element={
+            <ProtectedRoute>
+              <MockInterview />
+            </ProtectedRoute>
           }
         />
 
@@ -49,7 +62,6 @@ export default function App() {
 
         {/* Default */}
         <Route path="*" element={<Login />} />
-
       </Routes>
     </BrowserRouter>
   );

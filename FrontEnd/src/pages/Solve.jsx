@@ -5,10 +5,13 @@ import { submitCode } from "../store/slices/submissionSlice";
 import CodeEditor from "../components/CodeEditor";
 import ExecutionResult from "../components/ExecutionResult";
 import React from "react";
+import ExplanationPanel from "../components/ExplanationPanel";
+
 
 export default function Solve() {
   const dispatch = useDispatch();
   const [code, setCode] = useState("");
+  const [language, setLanguage] = useState("javascript");
 
   const recommendation = useSelector(
     (state) => state.recommendation.data
@@ -29,7 +32,7 @@ export default function Solve() {
       submitCode({
         skillKey: recommendation.problem.skillKey,
         problemId: recommendation.problem.problemId,
-        language: "javascript",
+        language: language,
         sourceCode: code,
         mistakes: []
       })
@@ -55,12 +58,15 @@ export default function Solve() {
       <CodeEditor
         code={code}
         setCode={setCode}
+        language={language}
+        setLanguage={setLanguage}
         onRun={runCode}
         loading={loading}
       />
 
       {/* Execution Result */}
       <ExecutionResult execution={result?.execution} />
+      <ExplanationPanel explanation={result?.explanation} />
 
       {/* Mastery Feedback */}
       {result?.updatedSkill && (
