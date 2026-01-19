@@ -4,6 +4,9 @@ import { fetchSkills, fetchSkillTrend } from "../store/slices/skillsSlice";
 import { fetchRecommendation } from "../store/slices/recommendationSlice";
 import SkillCard from "../components/SkillCard";
 import SkillTrendChart from "../components/SkillTrendChart";
+import { useNavigate } from "react-router-dom";
+import { fetchProblemsBySkill } from "../store/slices/problemSlice";
+import ProblemListModal from "../components/ProblemsList";
 
 // const SkillTrendChart = ({ data }) => {
 //   if (!data) return null;
@@ -35,16 +38,22 @@ export default function Dashboard() {
   const skills = useSelector((state) => state.skills.list);
   const recommendation = useSelector((state) => state.recommendation.data);
   const trends = useSelector((s) => s.skills.trends);
+  const problem = useSelector((s)=>s.problem)
+   const [isModalOpen, setIsModalOpen] = useState(false);
+  const navigate = useNavigate();
   useEffect(() => {
     dispatch(fetchSkills());
     dispatch(fetchRecommendation());
   }, [dispatch]);
   const [selectedSkill, setSelectedSkill] = useState(null);
   const selectSkill = (skillKey) => {
+    dispatch(fetchProblemsBySkill(skillKey));
+    setIsModalOpen(true)
     setSelectedSkill(skillKey);
     dispatch(fetchSkillTrend(skillKey));
+    
   };
-
+  // console.log(recommendation);
    return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 py-8">
       <div className="p-6 space-y-6 max-w-6xl mx-auto">
@@ -63,14 +72,20 @@ export default function Dashboard() {
               </div>
               <p className="mt-2 text-white font-medium text-lg">{recommendation.problem.title}</p>
               <p className="text-sm text-indigo-100 mt-1">{recommendation.reason}</p>
-              <button className="mt-4 bg-white/20 hover:bg-white/30 text-white px-6 py-2 rounded-lg font-medium transition">
+
+              <button className="mt-4 bg-white/20 hover:bg-white/30 text-white px-6 py-2 rounded-lg font-medium transition" onClick={()=>navigate('/solve/'+recommendation.problem.problemId)}>
                 Start Problem
               </button>
             </div>
           </div>
         )}
 
-        {selectedSkill && <SkillTrendChart data={trends[selectedSkill]} />}
+        {/* {selectedSkill && <SkillTrendChart data={trends[selectedSkill]} />} */}
+        <ProblemListModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        problems={problem.problemsList} 
+      />
 
         {/* Skills */}
         <div>

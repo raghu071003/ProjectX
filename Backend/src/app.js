@@ -6,7 +6,8 @@ import submissionRoutes from "./routes/submission.routes.js";
 import recommendationRoutes from "./routes/recommendation.routes.js";
 import mockRouter from "./routes/mock.routes.js"
 import cors from "cors";
-import corsConfig from "./config/corsConfig.js";    
+import corsConfig from "./config/corsConfig.js";
+import problemRoutes from "./routes/problem.routes.js";    
 
 const app = express();
 app.use(express.json());
@@ -21,6 +22,7 @@ app.use("/api/skills", skillsRouter);
 app.use("/api/submissions", submissionRoutes);
 app.use('/api/recommendations',recommendationRoutes );
 app.use("/api/mock",mockRouter);
+app.use("/api/problems",problemRoutes);
 
 
 app.use((err, req, res, next) => {

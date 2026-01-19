@@ -52,7 +52,7 @@ export default function App() {
         />
 
         <Route
-          path="/solve"
+          path="/solve/:problemId"
           element={
             <ProtectedRoute>
               <Solve />

@@ -20,7 +20,7 @@ const userSkillStateSchema = new mongoose.Schema({
     date: { type: Date, default: Date.now }
   }
 ]
-,
+, 
   attempts: {
     type: Number,
     default: 0

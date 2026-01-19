@@ -1,4 +1,12 @@
 import mongoose from "mongoose";
+const testCaseSchema = new mongoose.Schema({
+  input: String,
+  expectedOutput: String,
+  isHidden: {
+    type: Boolean,
+    default: false
+  }
+});
 
 const problemSchema = new mongoose.Schema({
   problemId: {
@@ -20,7 +28,11 @@ const problemSchema = new mongoose.Schema({
   },
   estimatedTime: {
     type: Number // seconds
-  }
+  },
+   starterCode: {
+    javascript: String
+  },
+  testCases: [testCaseSchema]
 });
 
 const Problem = mongoose.model("Problem", problemSchema);

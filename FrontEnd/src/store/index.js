@@ -4,6 +4,7 @@ import skillsReducer from "./slices/skillsSlice.js";
 import recommendationReducer from "./slices/recommendationSlice.js";
 import submissionReducer from "./slices/submissionSlice.js";
 import mockReducer from "./slices/mockSlice.js";
+import problemReducer from "./slices/problemSlice.js";
 
 export const store = configureStore({
   reducer: {
@@ -11,6 +12,7 @@ export const store = configureStore({
     skills: skillsReducer,
     recommendation: recommendationReducer,
     submission: submissionReducer,
-    mock:mockReducer
+    mock:mockReducer,
+    problem:problemReducer
   }
 });

@@ -15,12 +15,17 @@ export default function Navbar() {
     navigate("/login");
   };
 
-  return (
-    <nav className="w-full border-b bg-white">
-      <div className="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
+   return (
+    <nav className="w-full border-b border-gray-700 bg-gray-800 sticky top-0 z-50 backdrop-blur-sm">
+      <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
 
         {/* Brand */}
-        <Link to="/dashboard" className="font-bold text-lg">
+        <Link to="/dashboard" className="font-bold text-xl text-white flex items-center gap-2 hover:text-indigo-400 transition">
+          <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center shadow-lg shadow-indigo-500/30">
+            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+            </svg>
+          </div>
           SkillForge
         </Link>
 
@@ -30,13 +35,13 @@ export default function Navbar() {
             <>
               <Link
                 to="/login"
-                className="text-gray-700 hover:text-black"
+                className="text-gray-300 hover:text-white transition"
               >
                 Login
               </Link>
               <Link
                 to="/register"
-                className="px-3 py-1.5 border rounded hover:bg-gray-100"
+                className="px-4 py-2 border border-gray-600 rounded-lg hover:bg-gray-700 text-gray-300 hover:text-white transition"
               >
                 Register
               </Link>
@@ -47,21 +52,16 @@ export default function Navbar() {
             <>
               <Link
                 to="/dashboard"
-                className="text-gray-700 hover:text-black"
+                className="text-gray-300 hover:text-white transition"
               >
                 Dashboard
               </Link>
 
-              <Link
-                to="/solve"
-                className="text-gray-700 hover:text-black"
-              >
-                Solve
-              </Link>
+              
 
               <button
                 onClick={handleLogout}
-                className="px-3 py-1.5 border rounded hover:bg-gray-100"
+                className="px-4 py-2 border border-gray-600 rounded-lg hover:bg-gray-700 text-gray-300 hover:text-white transition"
               >
                 Logout
               </button>
@@ -72,4 +72,6 @@ export default function Navbar() {
       </div>
     </nav>
   );
-}
+};
+
+
