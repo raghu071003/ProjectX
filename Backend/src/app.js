@@ -8,6 +8,7 @@ import mockRouter from "./routes/mock.routes.js"
 import cors from "cors";
 import corsConfig from "./config/corsConfig.js";
 import problemRoutes from "./routes/problem.routes.js";    
+import profileRoutes from "./routes/profile.routes.js";
 
 const app = express();
 app.use(express.json());
@@ -23,6 +24,7 @@ app.use("/api/submissions", submissionRoutes);
 app.use('/api/recommendations',recommendationRoutes );
 app.use("/api/mock",mockRouter);
 app.use("/api/problems",problemRoutes);
+app.use("/api/profile",profileRoutes);
 
 
 app.use((err, req, res, next) => {

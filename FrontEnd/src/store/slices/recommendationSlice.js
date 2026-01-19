@@ -4,7 +4,7 @@ import api from "../../apis/axios";
 export const fetchRecommendation = createAsyncThunk(
   "recommendation/fetch",
   async () => {
-    const res = await api.get("/recommendations/next");
+    const res = await api.get("/recommendations/next-ai");
     return res.data;
   }
 );
@@ -13,7 +13,7 @@ const recommendationSlice = createSlice({
   name: "recommendation",
   initialState: {
     data: null,
-    loading: false
+    loadingRecommendation: false
   },
   extraReducers: (builder) => {
     builder

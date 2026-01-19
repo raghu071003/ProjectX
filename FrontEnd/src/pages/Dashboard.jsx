@@ -37,6 +37,7 @@ export default function Dashboard() {
   const dispatch = useDispatch();
   const skills = useSelector((state) => state.skills.list);
   const recommendation = useSelector((state) => state.recommendation.data);
+  const loadingRecommendation = useSelector((state) => state.recommendation.loadingRecommendation);
   const trends = useSelector((s) => s.skills.trends);
   const problem = useSelector((s)=>s.problem)
    const [isModalOpen, setIsModalOpen] = useState(false);
@@ -53,12 +54,14 @@ export default function Dashboard() {
     dispatch(fetchSkillTrend(skillKey));
     
   };
-  // console.log(recommendation);
+  // console.log(loadingRecommendation);
    return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 py-8">
       <div className="p-6 space-y-6 max-w-6xl mx-auto">
-        {/* Recommendation */}
-        {recommendation && (
+        
+        {
+
+        recommendation && (
           <div className="p-6 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 border border-indigo-500/50 relative overflow-hidden">
             <div className="absolute inset-0 bg-grid-white/[0.05] bg-[size:20px_20px]"></div>
             <div className="relative">
@@ -72,6 +75,9 @@ export default function Dashboard() {
               </div>
               <p className="mt-2 text-white font-medium text-lg">{recommendation.problem.title}</p>
               <p className="text-sm text-indigo-100 mt-1">{recommendation.reason}</p>
+              {recommendation.explanation && (
+                <p className="text-sm text-indigo-100 mt-1 italic">"{recommendation.explanation}"</p>
+              )}
 
               <button className="mt-4 bg-white/20 hover:bg-white/30 text-white px-6 py-2 rounded-lg font-medium transition" onClick={()=>navigate('/solve/'+recommendation.problem.problemId)}>
                 Start Problem

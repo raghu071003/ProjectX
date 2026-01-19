@@ -9,6 +9,7 @@ import PublicRoute from "./components/PublicRoute";
 import Navbar from "./components/Navbar.jsx";
 import MockInterview from "./pages/MockInterview.jsx";
 import HomePage from "./pages/HomePage.jsx";
+import ProfilePage from "./pages/Profile.jsx";
 
 export default function App() {
   return (
@@ -58,6 +59,15 @@ export default function App() {
               <Solve />
             </ProtectedRoute>
           }
+        />
+
+        <Route 
+        path="/profile"
+        element={
+          <ProtectedRoute>
+            <ProfilePage />
+          </ProtectedRoute>
+        }
         />
 
         {/* Default */}

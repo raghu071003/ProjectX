@@ -56,7 +56,12 @@ export default function Navbar() {
               >
                 Dashboard
               </Link>
-
+              <Link
+                to="/profile"
+                className="text-gray-300 hover:text-white transition"
+              >
+                Profile
+              </Link>
               
 
               <button

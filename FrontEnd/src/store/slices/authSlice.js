@@ -34,6 +34,22 @@ export const registerUser = createAsyncThunk(
     }
   }
 );
+export const googleLogin = createAsyncThunk(
+  "auth/googleLogin",
+  async (token, thunkAPI) => {
+    try {
+      const res = await fetch("/auth/google", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token })
+      });
+
+      return await res.json();
+    } catch (err) {
+      return thunkAPI.rejectWithValue("Google login failed");
+    }
+  }
+);
 
 const authSlice = createSlice({
   name: "auth",
@@ -65,6 +81,20 @@ const authSlice = createSlice({
         localStorage.setItem("token", action.payload);
       })
       .addCase(loginUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(googleLogin.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(googleLogin.fulfilled, (state, action) => {
+        state.loading = false;
+        state.token = action.payload.token;
+        state.isAuthenticated = true;
+        localStorage.setItem("token", action.payload.token);
+      })
+      .addCase(googleLogin.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
