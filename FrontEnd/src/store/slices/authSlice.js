@@ -45,6 +45,7 @@ export const googleLogin = createAsyncThunk(
       });
 
       return await res.json();
+    // eslint-disable-next-line no-unused-vars
     } catch (err) {
       return thunkAPI.rejectWithValue("Google login failed");
     }

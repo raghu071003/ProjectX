@@ -18,11 +18,11 @@ const recommendationSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(fetchRecommendation.pending, (state) => {
-        state.loading = true;
+        state.loadingRecommendation = true;
       })
       .addCase(fetchRecommendation.fulfilled, (state, action) => {
         state.data = action.payload;
-        state.loading = false;
+        state.loadingRecommendation = false;
       });
   }
 });

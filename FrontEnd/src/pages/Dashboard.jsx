@@ -37,7 +37,9 @@ export default function Dashboard() {
   const dispatch = useDispatch();
   const skills = useSelector((state) => state.skills.list);
   const recommendation = useSelector((state) => state.recommendation.data);
+  // eslint-disable-next-line no-unused-vars
   const loadingRecommendation = useSelector((state) => state.recommendation.loadingRecommendation);
+  // eslint-disable-next-line no-unused-vars
   const trends = useSelector((s) => s.skills.trends);
   const problem = useSelector((s)=>s.problem)
    const [isModalOpen, setIsModalOpen] = useState(false);
@@ -46,6 +48,7 @@ export default function Dashboard() {
     dispatch(fetchSkills());
     dispatch(fetchRecommendation());
   }, [dispatch]);
+  // eslint-disable-next-line no-unused-vars
   const [selectedSkill, setSelectedSkill] = useState(null);
   const selectSkill = (skillKey) => {
     dispatch(fetchProblemsBySkill(skillKey));

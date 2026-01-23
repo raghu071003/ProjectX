@@ -24,7 +24,7 @@ const problems = [
       {
         input: JSON.stringify({ nums: [3,2,4], target: 6 }),
         expectedOutput: "[1,2]",
-        isHidden: true
+        isHidden: true  
       }
     ]
   },

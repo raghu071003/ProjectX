@@ -6,40 +6,47 @@ import { evaluateSubmission } from "./codeEvaluation.service.js";
 import { runCode } from "./compiler.service.js";
 import { generateExplanation } from "./explanation.service.js";
 
+
 const createSubmission = async (userId, data) => {
   let execution = null;
   let verdict = null;
-  console.log(data)
 
-  // 1️⃣ Fetch problem (CRITICAL)
+  // 1️⃣ Fetch problem
   const problem = await Problem.findOne({
-    problemId: data.problemId
+    problemId: data.problemId,
   });
 
   if (!problem) {
     throw new Error("Problem not found");
   }
 
-  // 2️⃣ Evaluate submission against test cases
+  // 2️⃣ Evaluate submission
   if (data.sourceCode && data.language) {
-    verdict = await evaluateSubmission({
+    const judgeResult = await evaluateSubmission({
       sourceCode: data.sourceCode,
       language: data.language,
-      problem
+      problem,
     });
 
     execution = {
-      success: verdict.success,
-      error: verdict.error || null
+      success: judgeResult.success,
+      error: judgeResult.error || null,
+      summary: judgeResult.summary || null,
+      testCases: judgeResult.testCases || [],
+      hiddenTestFailed: judgeResult.hiddenTestFailed || false,
     };
+
+    verdict = judgeResult.success
+      ? "Accepted"
+      : judgeResult.error || "Rejected";
   }
 
   // 3️⃣ Save submission
   const submission = await Submission.create({
     userId,
-    skillKey: problem.skillKey,              // ✅ source of truth
+    skillKey: problem.skillKey,
     problemId: problem.problemId,
-    correct: verdict?.success ?? data.correct,
+    correct: execution?.success ?? data.correct,
     timeTaken: data.timeTaken || 0,
     mistakes: data.mistakes || [],
     complexity: data.complexity || null,
@@ -82,11 +89,15 @@ const createSubmission = async (userId, data) => {
   skillState.mastery = newMastery;
 
   skillState.avgTime =
-    (skillState.avgTime * (skillState.attempts - 1) + submission.timeTaken) /
+    (skillState.avgTime * (skillState.attempts - 1) +
+      submission.timeTaken) /
     skillState.attempts;
 
   submission.mistakes.forEach((m) => {
-    skillState.mistakes.set(m, (skillState.mistakes.get(m) || 0) + 1);
+    skillState.mistakes.set(
+      m,
+      (skillState.mistakes.get(m) || 0) + 1
+    );
   });
 
   await skillState.save();
@@ -94,16 +105,13 @@ const createSubmission = async (userId, data) => {
   // 7️⃣ Return judge-style response
   return {
     submission,
-    verdict: verdict
-      ? verdict.success
-        ? "Accepted"
-        : verdict.error
-      : "Submitted",
+    verdict,
     execution,
     updatedSkill: skillState,
     explanation,
   };
 };
+
 
 
 export { createSubmission };

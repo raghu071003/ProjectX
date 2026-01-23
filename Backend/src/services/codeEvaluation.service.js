@@ -10,18 +10,17 @@ export const evaluateSubmission = async ({
   language,
   problem,
 }) => {
-  // console.log(problem)
-  // 1️⃣ Language guard
+  // 1️⃣ Language check
   if (language !== "javascript") {
     return { success: false, error: "Unsupported Language" };
   }
 
-  // 2️⃣ Enforce solve() existence
+  // 2️⃣ solve() existence
   if (!/function\s+solve\s*\(/.test(sourceCode)) {
     return { success: false, error: "Missing solve() function" };
   }
 
-  // 3️⃣ HARD syntax validation (critical)
+  // 3️⃣ Syntax validation
   try {
     new Function(sourceCode);
   } catch (err) {
@@ -32,12 +31,15 @@ export const evaluateSubmission = async ({
     };
   }
 
-  // 4️⃣ Execute against each test case
-  for (const testCase of problem.testCases) {
+  const results = [];
+
+  // 4️⃣ Run all test cases
+  for (let i = 0; i < problem.testCases.length; i++) {
+    const testCase = problem.testCases[i];
+
     const wrappedCode = `
 ${sourceCode}
 
-// 🚨 Forced execution wrapper
 if (typeof solve !== "function") {
   throw new Error("solve() not defined");
 }
@@ -60,27 +62,36 @@ if (typeof result === "object") {
 }
 `;
 
-    const response = await axios.post(
-      PISTON_URL,
-      {
-        language: "javascript",
-        version: "*",
-        files: [{ content: wrappedCode }],
-        stdin: testCase.input,
-      },
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
+    let response;
+    try {
+      response = await axios.post(
+        PISTON_URL,
+        {
+          language: "javascript",
+          version: "*",
+          files: [{ content: wrappedCode }],
+          stdin: testCase.input,
         },
-      }
-    );
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+        }
+      );
+    } catch {
+      return {
+        success: false,
+        error: "Judge Error",
+        details: "Execution service unavailable",
+      };
+    }
 
     const compileErr = response.data.compile?.stderr?.trim();
     const runtimeErr = response.data.run?.stderr?.trim();
     const stdout = response.data.run?.stdout ?? "";
 
-    // 5️⃣ Compilation error
+    // 🚨 Compilation error
     if (compileErr) {
       return {
         success: false,
@@ -89,7 +100,7 @@ if (typeof result === "object") {
       };
     }
 
-    // 6️⃣ Runtime error
+    // 🚨 Runtime error
     if (runtimeErr) {
       return {
         success: false,
@@ -98,26 +109,77 @@ if (typeof result === "object") {
       };
     }
 
-    // 7️⃣ No output
+    // 🚨 No output
     if (!stdout.trim()) {
-      return {
-        success: false,
-        error: "No Output",
-      };
+      results.push({
+        index: i,
+        status: "FAILED",
+        isHidden: testCase.isHidden,
+        ...(testCase.isHidden
+          ? {}
+          : {
+              input: testCase.input,
+              expectedOutput: testCase.expectedOutput,
+              actualOutput: "",
+            }),
+      });
+      continue;
     }
 
-    // 8️⃣ Wrong answer
-    if (
-      normalize(stdout) !==
-      normalize(testCase.expectedOutput)
-    ) {
-      return {
-        success: false,
-        error: "Wrong Answer",
-      };
+    const actualOutput = normalize(stdout);
+    const expectedOutput = normalize(testCase.expectedOutput);
+
+    // ❌ Wrong Answer
+    if (actualOutput !== expectedOutput) {
+      results.push({
+        index: i,
+        status: "FAILED",
+        isHidden: testCase.isHidden,
+        ...(testCase.isHidden
+          ? {}
+          : {
+              input: testCase.input,
+              expectedOutput: testCase.expectedOutput,
+              actualOutput: stdout.trim(),
+            }),
+      });
+    } else {
+      // ✅ Passed
+      results.push({
+        index: i,
+        status: "PASSED",
+        isHidden: testCase.isHidden,
+        ...(testCase.isHidden
+          ? {}
+          : { output: stdout.trim() }),
+      });
     }
   }
 
-  // ✅ All test cases passed
-  return { success: true };
+  // 5️⃣ Final evaluation
+  const failed = results.filter(r => r.status === "FAILED");
+  const publicResults = results.filter(r => !r.isHidden);
+
+  if (failed.length > 0) {
+    return {
+      success: false,
+      error: "Wrong Answer",
+      summary: {
+        total: results.length,
+        passed: results.length - failed.length,
+      },
+      testCases: publicResults,
+      hiddenTestFailed: failed.some(r => r.isHidden),
+    };
+  }
+
+  // ✅ All passed
+  return {
+    success: true,
+    summary: {
+      total: results.length,
+      passed: results.length,
+    },
+    testCases: publicResults,
+  };
 };

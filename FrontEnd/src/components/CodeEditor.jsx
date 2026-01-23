@@ -7,6 +7,7 @@ export default function CodeEditor({
   code,
   setCode,
   language = "javascript",
+  // eslint-disable-next-line no-unused-vars
   setLanguage,
   onRun,
   loading,
