@@ -9,9 +9,12 @@ export default function CodeEditor({
   language = "javascript",
   // eslint-disable-next-line no-unused-vars
   setLanguage,
+  loader,
   onRun,
   loading,
-  resetCode
+  resetCode,
+  onAnalyze,
+  analyzing
 }) {
   const [toggleLanguage,setToggleLanguage] = useState(true);
 
@@ -37,17 +40,17 @@ export default function CodeEditor({
             onClick={() => setToggleLanguage(!toggleLanguage)}
           >
             {toggleLanguage ? (
-              // <select
-              //   value={language}
-              //   onChange={(e) => setLanguage(e.target.value)}
-              //   className="bg-gray-900 text-white text-sm border border-gray-600 rounded-lg px-3 py-1.5 cursor-pointer hover:border-indigo-500/50 transition outline-none"
-              //   onClick={(e) => e.stopPropagation()}
-              // > 
-              //   <option value="javascript">JavaScript</option>
-              //   <option value="python">Python</option>
-              //   <option value="java">Java</option>
-              // </select>
-              ""
+              <select
+                value={language}
+                onChange={(e) => setLanguage(e.target.value)}
+                className="bg-gray-900 text-white text-sm border border-gray-600 rounded-lg px-3 py-1.5 cursor-pointer hover:border-indigo-500/50 transition outline-none"
+                onClick={(e) => e.stopPropagation()}
+              > 
+                <option value="javascript">JavaScript</option>
+                <option value="python">Python</option>
+                <option value="java">Java</option>
+                <option value="cpp">C++</option>
+              </select>
             ) : (
               <span className="text-xs px-3 py-1.5 rounded-lg bg-indigo-600 text-white font-medium">
                 {language}
@@ -59,9 +62,31 @@ export default function CodeEditor({
         <div className="flex items-center justify-center gap-1">
           <Button onClick={resetCode}>
             <span className="flex items-center">
-             
               <RefreshCcw /> Reset
             </span>
+          </Button>
+
+          <Button 
+            onClick={onAnalyze} 
+            disabled={analyzing || loading}
+            className="bg-purple-600 hover:bg-purple-700 text-white"
+          >
+            {analyzing ? (
+               <span className="flex items-center gap-2">
+                 <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle>
+                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                 </svg>
+                 Analyzing...
+               </span>
+            ) : (
+              <span className="flex items-center gap-2">
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                AI Coach
+              </span>
+            )}
           </Button>
             <Button
           onClick={onRun}

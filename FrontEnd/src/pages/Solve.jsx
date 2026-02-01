@@ -10,6 +10,8 @@ import CodeEditor from "../components/CodeEditor";
 import ExecutionResult from "../components/ExecutionResult";
 import ExplanationPanel from "../components/ExplanationPanel";
 import TestCasesPanel from "../components/TestCasesPanel";
+import AICoachPanel from "../components/AICoachPanel";
+import api from "../apis/axios";
 
 export default function Solve() {
   const dispatch = useDispatch();
@@ -17,6 +19,9 @@ export default function Solve() {
 
   const [language, setLanguage] = useState("javascript");
   const [code, setCode] = useState("");
+  
+  const [analyzing, setAnalyzing] = useState(false);
+  const [aiFeedback, setAiFeedback] = useState(null);
 
   const problem = useSelector((state) => state.problem);
   const { result, loading } = useSelector((state) => state.submission);
@@ -54,6 +59,24 @@ export default function Solve() {
     // console.log(currProblem.starterCode)
     setCode(currProblem.starterCode[language] || "");
   };
+
+  const handleAnalyze = async () => {
+    if (!code.trim()) return;
+    setAnalyzing(true);
+    setAiFeedback(null);
+    try {
+      const response = await api.post("/ai-coach/analyze", {
+        code,
+        language,
+        problemTitle: currProblem?.title,
+      });
+      setAiFeedback(response.data);
+    } catch (error) {
+      console.error("Analysis failed", error);
+    } finally {
+      setAnalyzing(false);
+    }
+  };
   if (!currProblem)
     return <div className="p-10 text-center">Loading problem...</div>;
 
@@ -67,7 +90,7 @@ export default function Solve() {
           <h1 className="text-2xl font-bold text-gray-900 mb-3">
             {currProblem.title}
           </h1>
-
+          <p className="text-gray-600 leading-relaxed mb-8">Note : If you choose a language other than javascript, the boiler plate must be written by you.</p>
           <div className="flex flex-wrap gap-3 text-sm">
             <span
               className={`px-3 py-1 rounded-full font-medium ${
@@ -97,8 +120,7 @@ export default function Solve() {
           <div className="prose prose-slate max-w-none">
             <p className="text-gray-600 leading-relaxed">
               {/* Fallback description text if not in currProblem */}
-              Solve the problem using the provided test cases as a guide. Ensure
-              your solution handles edge cases efficiently.
+              {currProblem.description}
             </p>
           </div>
 
@@ -134,7 +156,10 @@ export default function Solve() {
               onRun={runCode}
               loading={loading}
               starterCode={currProblem?.starterCode}
+              onAnalyze={handleAnalyze}
+              analyzing={analyzing}
             />
+            <AICoachPanel feedback={aiFeedback} onClose={() => setAiFeedback(null)} />
           </div>
         </div>
 
