@@ -1,7 +1,10 @@
 import axios from "axios";
+console.log(import.meta.env.VITE_ENV)
 
+const url = import.meta.env.VITE_ENV === "production" ? "https://projectx-o5ae.onrender.com" : "http://localhost:5000/api"
+console.log(url)
 const api = axios.create({
-  baseURL: "http://localhost:5000/api"
+  baseURL: url
 });
 
 api.interceptors.request.use((config) => {
