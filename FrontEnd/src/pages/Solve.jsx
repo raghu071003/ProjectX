@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
-import { Play, Clock, BarChart2, CheckCircle, AlertCircle } from "lucide-react"; // Assuming you might have lucide-react or similar icons. If not, remove the icons.
+import { useParams, useLocation } from "react-router-dom";
+import { Play, Clock, BarChart2, CheckCircle, AlertCircle } from "lucide-react"; 
+import { useSocket } from "../context/SocketContext";
 
 import { submitCode } from "../store/slices/submissionSlice";
 import { fetchProblem } from "../store/slices/problemSlice";
@@ -16,9 +17,11 @@ import api from "../apis/axios";
 export default function Solve() {
   const dispatch = useDispatch();
   const { problemId } = useParams();
+  const location = useLocation();
 
   const [language, setLanguage] = useState("javascript");
   const [code, setCode] = useState("");
+  const [roomId, setRoomId] = useState("");
   
   const [analyzing, setAnalyzing] = useState(false);
   const [aiFeedback, setAiFeedback] = useState(null);
@@ -27,6 +30,50 @@ export default function Solve() {
   const { result, loading } = useSelector((state) => state.submission);
 
   const currProblem = problem.current;
+  const socket = useSocket();
+  const isRemoteUpdate = useRef(false);
+
+  /* Socket Initialization */
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleCodeUpdate = (newCode) => {
+      isRemoteUpdate.current = true;
+      setCode(newCode);
+    };
+
+    socket.on("code_update", handleCodeUpdate);
+
+    // Auto-join if roomId passed via navigation
+    if (location.state?.roomId) {
+        setRoomId(location.state.roomId);
+        socket.emit("join_room", location.state.roomId);
+        // Clear state to prevent re-joining on refresh/update if desired, 
+        // but replacing history is cleaner. For now just emitting is fine.
+    }
+
+    return () => {
+      socket.off("code_update", handleCodeUpdate);
+    };
+  }, [socket, location.state]);
+
+  const handleJoinRoom = (id) => {
+    if (!socket) return;
+    setRoomId(id);
+    socket.emit("join_room", id);
+  };
+
+  const handleLeaveRoom = () => {
+    setRoomId("");
+  };
+
+  const handleCodeChange = (newCode) => {
+    setCode(newCode);
+    if (roomId && !isRemoteUpdate.current && socket) {
+      socket.emit("code_change", { roomId, code: newCode });
+    }
+    isRemoteUpdate.current = false;
+  };
 
   /* 1️⃣ Fetch problem on mount */
   useEffect(() => {
@@ -56,7 +103,7 @@ export default function Solve() {
     );
   };
   const resetCode = () => {
-    // console.log(currProblem.starterCode)
+    socketRef.current.emit("code_change", { roomId, code: currProblem.starterCode[language] });
     setCode(currProblem.starterCode[language] || "");
   };
 
@@ -150,7 +197,7 @@ export default function Solve() {
             <CodeEditor
               resetCode={resetCode}
               code={code}
-              setCode={setCode}
+              setCode={handleCodeChange}
               language={language}
               setLanguage={setLanguage}
               onRun={runCode}
@@ -158,6 +205,9 @@ export default function Solve() {
               starterCode={currProblem?.starterCode}
               onAnalyze={handleAnalyze}
               analyzing={analyzing}
+              roomId={roomId}
+              onJoinRoom={handleJoinRoom}
+              onLeaveRoom={handleLeaveRoom}
             />
             <AICoachPanel feedback={aiFeedback} onClose={() => setAiFeedback(null)} />
           </div>

@@ -33,4 +33,16 @@ const checkStatus = async(userId, problemId) => {
   }
   return submission.correct ? "Solved" : "Attempted";
 }
-export { getProblemById, getProblemsBySkill, checkStatus };
+
+const searchProblems = async(search) => {
+  const problems = await Problem.find({ title: { $regex: search, $options: "i" } }).lean();
+  if (!problems.length) {
+    throw new Error("No problems found for this search");
+  }
+  const result = problems.map((problem) => ({
+    label: problem.title,
+    value: problem.problemId,
+  }));
+  return result;
+}
+export { getProblemById, getProblemsBySkill, checkStatus, searchProblems };
