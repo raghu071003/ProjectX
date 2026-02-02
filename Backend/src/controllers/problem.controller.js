@@ -1,4 +1,4 @@
-import { checkStatus, getProblemById, getProblemsBySkill } from "../services/problem.service.js";
+import { checkStatus, getProblemById, getProblemsBySkill, searchProblems } from "../services/problem.service.js";
 
 
 
@@ -35,4 +35,14 @@ const getStatus = async(req,res)=>{
         res.status(404).json({ error: error.message });
     }
 }
-export { getProblem, getProblemsUnderSkill,getStatus };
+
+const search = async(req,res)=>{
+    try {
+        const {search}=req.params;
+        const problems=await searchProblems(search);
+        res.status(200).json(problems);
+    } catch (error) {
+        res.status(404).json({ error: error.message });
+    }
+}
+export { getProblem, getProblemsUnderSkill,getStatus,search };
