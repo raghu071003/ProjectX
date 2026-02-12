@@ -57,6 +57,14 @@ export default function Navbar() {
                 Dashboard
               </Link>
               <Link
+                onClick={()=>{
+                  navigate("/broadcasts")
+                }}
+                className="text-gray-300 hover:text-white transition"
+              >
+                Broadcasts
+              </Link>
+              <Link
                 to="/profile"
                 className="text-gray-300 hover:text-white transition"
               >

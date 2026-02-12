@@ -1,7 +1,7 @@
 import Editor from "@monaco-editor/react";
 import Button from "./Button";
 import { useState } from "react";
-import { RefreshCcw } from "lucide-react";
+import { RefreshCcw, Users, LogOut } from "lucide-react";
 
 export default function CodeEditor({
   code,
@@ -14,9 +14,22 @@ export default function CodeEditor({
   loading,
   resetCode,
   onAnalyze,
-  analyzing
+  analyzing,
+  roomId,
+  onJoinRoom,
+  onLeaveRoom
 }) {
   const [toggleLanguage,setToggleLanguage] = useState(true);
+  const [showJoinInput, setShowJoinInput] = useState(false);
+  const [inputRoomId, setInputRoomId] = useState("");
+
+  const handleJoin = () => {
+    if (inputRoomId.trim()) {
+      onJoinRoom(inputRoomId);
+      setShowJoinInput(false);
+      setInputRoomId("");
+    }
+  };
 
    return (
     <div className="border border-gray-700 rounded-xl overflow-hidden bg-gray-900 shadow-2xl">
@@ -55,6 +68,50 @@ export default function CodeEditor({
               <span className="text-xs px-3 py-1.5 rounded-lg bg-indigo-600 text-white font-medium">
                 {language}
               </span>
+            )}
+          </div>
+
+          {/* Multiplayer UI */}
+          <div className="flex items-center gap-2 border-l border-gray-600 pl-4">
+            {roomId ? (
+              <div className="flex items-center gap-2 bg-indigo-900/50 px-3 py-1.5 rounded-lg border border-indigo-500/30">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                </span>
+                <span className="text-xs text-white font-medium">Room: {roomId}</span>
+                <button onClick={onLeaveRoom} className="text-gray-400 hover:text-white ml-2">
+                  <LogOut size={14} />
+                </button>
+              </div>
+            ) : (
+              <div className="relative">
+                <button 
+                  onClick={() => setShowJoinInput(!showJoinInput)}
+                  className={`flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-lg transition-colors ${showJoinInput ? 'bg-indigo-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}`}
+                >
+                  <Users size={14} />
+                  Collaborate
+                </button>
+                
+                {showJoinInput && (
+                  <div className="absolute top-full left-0 mt-2 w-48 bg-gray-800 border border-gray-700 rounded-lg shadow-xl p-2 z-50 flex flex-col gap-2">
+                    <input
+                      type="text"
+                      placeholder="Enter Room ID"
+                      value={inputRoomId}
+                      onChange={(e) => setInputRoomId(e.target.value)}
+                      className="w-full bg-gray-900 text-white text-xs px-2 py-1.5 rounded border border-gray-600 focus:border-indigo-500 outline-none"
+                    />
+                    <button 
+                      onClick={handleJoin}
+                      className="w-full bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium py-1.5 rounded transition-colors"
+                    >
+                      Join Room
+                    </button>
+                  </div>
+                )}
+              </div>
             )}
           </div>
         </div>
