@@ -21,7 +21,8 @@ export default function Navbar() {
 
         {/* Brand */}
         <Link to="/dashboard" className="font-bold text-xl text-white flex items-center gap-2 hover:text-indigo-400 transition">
-          <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center shadow-lg shadow-indigo-500/30">
+          <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center shadow-lg shadow-indigo-500/30">
+
             <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
             </svg>
@@ -57,9 +58,7 @@ export default function Navbar() {
                 Dashboard
               </Link>
               <Link
-                onClick={()=>{
-                  navigate("/broadcasts")
-                }}
+                to="/broadcasts"
                 className="text-gray-300 hover:text-white transition"
               >
                 Broadcasts

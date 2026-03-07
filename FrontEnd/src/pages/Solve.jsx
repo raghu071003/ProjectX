@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams, useLocation } from "react-router-dom";
+import { useParams, useLocation, useSearchParams } from "react-router-dom";
+
 import { Play, Clock, BarChart2, CheckCircle, AlertCircle } from "lucide-react"; 
 import { useSocket } from "../context/SocketContext";
 
@@ -18,6 +19,8 @@ export default function Solve() {
   const dispatch = useDispatch();
   const { problemId } = useParams();
   const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
+
 
   const [language, setLanguage] = useState("javascript");
   const [code, setCode] = useState("");
@@ -25,6 +28,27 @@ export default function Solve() {
   
   const [analyzing, setAnalyzing] = useState(false);
   const [aiFeedback, setAiFeedback] = useState(null);
+  const [roomCount, setRoomCount] = useState(0);
+  const [notification, setNotification] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [isFetchingUser, setIsFetchingUser] = useState(true);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      setIsFetchingUser(true);
+      try {
+        const res = await api.get("/profile");
+        setCurrentUser(res.data.user);
+      } catch (err) {
+        console.error("Failed to fetch user profile", err);
+      } finally {
+        setIsFetchingUser(false);
+      }
+    };
+    fetchUser();
+  }, []);
+
+
 
   const problem = useSelector((state) => state.problem);
   const { result, loading } = useSelector((state) => state.submission);
@@ -33,7 +57,9 @@ export default function Solve() {
   const socket = useSocket();
   const isRemoteUpdate = useRef(false);
 
-  /* Socket Initialization */
+  const urlRoomId = searchParams.get("roomId");
+
+  /* Socket Initialization & Event Listeners */
   useEffect(() => {
     if (!socket) return;
 
@@ -44,28 +70,72 @@ export default function Solve() {
 
     socket.on("code_update", handleCodeUpdate);
 
-    // Auto-join if roomId passed via navigation
-    if (location.state?.roomId) {
-        setRoomId(location.state.roomId);
-        socket.emit("join_room", location.state.roomId);
-        // Clear state to prevent re-joining on refresh/update if desired, 
-        // but replacing history is cleaner. For now just emitting is fine.
-    }
+    socket.on("room_update", ({ count }) => {
+      setRoomCount(count);
+    });
+
+    socket.on("user_joined", () => {
+      setNotification("Another user joined the room!");
+      setTimeout(() => setNotification(null), 3000);
+    });
+
+    socket.on("join_error", (errorMessage) => {
+      setNotification(errorMessage);
+      setRoomId("");
+      setRoomCount(0);
+      setSearchParams({}); // Clear from URL if error
+      setTimeout(() => setNotification(null), 5000);
+    });
 
     return () => {
       socket.off("code_update", handleCodeUpdate);
+      socket.off("room_update");
+      socket.off("user_joined");
+      socket.off("join_error");
     };
-  }, [socket, location.state]);
+  }, [socket]);
+
+  /* Reactive Room Joining */
+  useEffect(() => {
+    if (!socket || !currentUser || !problemId) return;
+
+    if (urlRoomId) {
+      setRoomId(urlRoomId);
+      socket.emit("join_room", { 
+        roomId: urlRoomId, 
+        userId: currentUser._id,
+        problemId: problemId 
+      });
+      console.log(`Auto-joining room ${urlRoomId} for problem ${problemId}`);
+    } else {
+      setRoomId("");
+      setRoomCount(0);
+    }
+  }, [socket, urlRoomId, currentUser, problemId]);
+
+
+
 
   const handleJoinRoom = (id) => {
-    if (!socket) return;
+    if (!socket || !currentUser) return;
     setRoomId(id);
-    socket.emit("join_room", id);
+    setSearchParams({ roomId: id });
+    socket.emit("join_room", { roomId: id, userId: currentUser._id, problemId: problemId });
   };
 
+
+
+
   const handleLeaveRoom = () => {
+    if (socket && roomId && currentUser) {
+      socket.emit("leave_room", { roomId, userId: currentUser._id });
+    }
     setRoomId("");
+    setRoomCount(0);
+    setSearchParams({});
   };
+
+
 
   const handleCodeChange = (newCode) => {
     setCode(newCode);
@@ -103,9 +173,13 @@ export default function Solve() {
     );
   };
   const resetCode = () => {
-    socketRef.current.emit("code_change", { roomId, code: currProblem.starterCode[language] });
-    setCode(currProblem.starterCode[language] || "");
+    const starterCode = currProblem.starterCode?.[language] || "";
+    if (roomId && socket) {
+      socket.emit("code_change", { roomId, code: starterCode });
+    }
+    setCode(starterCode);
   };
+
 
   const handleAnalyze = async () => {
     if (!code.trim()) return;
@@ -124,8 +198,16 @@ export default function Solve() {
       setAnalyzing(false);
     }
   };
-  if (!currProblem)
-    return <div className="p-10 text-center">Loading problem...</div>;
+  if (!currProblem || isFetchingUser)
+    return (
+      <div className="h-screen flex items-center justify-center bg-gray-900">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-gray-400 font-medium animate-pulse">Setting up your workspace...</p>
+        </div>
+      </div>
+    );
+
 
   return (
     // Main Container: Full viewport height, restricted scroll on body
@@ -192,8 +274,8 @@ export default function Solve() {
             min-h-0 is crucial here: it allows the flex item to shrink below its content size, 
             triggering the scrollbar on the child instead of expanding the page. 
         */}
-        <div className="flex-1 flex flex-col p-4 pb-0 min-h-0">
-          <div className="flex-1 bg-white rounded-xl shadow-sm border border-gray-200 overflow-y-auto relative flex flex-col">
+        <div className="flex-1 flex flex-col p-4 pb-4 min-h-0 bg-gray-50">
+          <div className="flex-1 relative flex flex-col overflow-hidden">
             <CodeEditor
               resetCode={resetCode}
               code={code}
@@ -205,10 +287,26 @@ export default function Solve() {
               starterCode={currProblem?.starterCode}
               onAnalyze={handleAnalyze}
               analyzing={analyzing}
-              roomId={roomId}
-              onJoinRoom={handleJoinRoom}
-              onLeaveRoom={handleLeaveRoom}
+               roomId={roomId}
+               onJoinRoom={handleJoinRoom}
+               onLeaveRoom={handleLeaveRoom}
+               roomCount={roomCount}
             />
+            {notification && (
+              <div className="absolute top-4 right-4 z-[100] animate-in fade-in slide-in-from-top-4 duration-300">
+                <div className="bg-gray-800/95 backdrop-blur-md border border-indigo-500/30 text-white px-5 py-3 rounded-xl shadow-[0_8px_32px_rgba(0,0,0,0.4)] flex items-center gap-3">
+                  <div className="w-2 h-2 bg-indigo-500 rounded-full animate-ping"></div>
+                  <span className="text-sm font-medium">{notification}</span>
+                  <button 
+                    onClick={() => setNotification(null)}
+                    className="ml-2 text-gray-400 hover:text-white transition-colors"
+                  >
+                    <AlertCircle size={14} />
+                  </button>
+                </div>
+              </div>
+            )}
+
             <AICoachPanel feedback={aiFeedback} onClose={() => setAiFeedback(null)} />
           </div>
         </div>
@@ -219,11 +317,12 @@ export default function Solve() {
             <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
               {/* Mastery Feedback */}
               {result?.updatedSkill && (
-                <div className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white p-4 rounded-lg shadow-md flex justify-between items-center">
+                <div className="bg-indigo-600 text-white p-4 rounded-lg shadow-md flex justify-between items-center">
                   <div>
                     <p className="text-xs opacity-90 uppercase tracking-wider font-semibold">
                       Skill Mastery
                     </p>
+
                     <p className="text-lg font-bold">
                       {(result.updatedSkill.mastery * 100).toFixed(1)}%
                     </p>
