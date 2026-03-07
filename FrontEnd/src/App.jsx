@@ -13,6 +13,7 @@ import ProfilePage from "./pages/Profile.jsx";
 import TestSocket from "./pages/TestSocket.jsx";
 import { SocketProvider } from "./context/SocketContext";
 import GlobalBroadcast from "./components/GlobalBroadcast";
+import Broadcasts from "./pages/Broadcasts.jsx";
 
 export default function App() {
   return (
@@ -71,6 +72,15 @@ export default function App() {
         element={
           <ProtectedRoute>
             <ProfilePage />
+          </ProtectedRoute>
+        }
+        />
+
+        <Route 
+        path="/broadcasts"
+        element={
+          <ProtectedRoute>
+            <Broadcasts />
           </ProtectedRoute>
         }
         />

@@ -59,13 +59,13 @@ export default function Dashboard() {
   };
   // console.log(loadingRecommendation);
    return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 py-8">
+    <div className="min-h-screen bg-gray-900 py-8">
       <div className="p-6 space-y-6 max-w-6xl mx-auto">
         
         {
 
         recommendation && (
-          <div className="p-6 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 border border-indigo-500/50 relative overflow-hidden">
+          <div className="p-6 rounded-xl bg-indigo-600 border border-indigo-500/50 relative overflow-hidden">
             <div className="absolute inset-0 bg-grid-white/[0.05] bg-[size:20px_20px]"></div>
             <div className="relative">
               <div className="flex items-center mb-3">
@@ -108,7 +108,7 @@ export default function Dashboard() {
               <p className="text-gray-400 text-lg">
                 You haven't started practicing yet. Solve a problem to begin tracking your skills.
               </p>
-              <button className="mt-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white px-6 py-2 rounded-lg font-medium transition">
+              <button className="mt-4 bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-2 rounded-lg font-medium transition">
                 Browse Problems
               </button>
             </div>

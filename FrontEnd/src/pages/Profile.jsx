@@ -70,7 +70,7 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 py-12 px-4 sm:px-6 lg:px-8 font-sans">
+    <div className="min-h-screen bg-gray-900 py-12 px-4 sm:px-6 lg:px-8 font-sans">
       <div className="max-w-3xl mx-auto space-y-6">
         
         {/* Header / Title */}
@@ -93,10 +93,10 @@ export default function ProfilePage() {
           </div>
         )}
 
-        <div className="bg-gray-200 shadow-sm rounded-xl border border-gray-200 overflow-hidden">
+        <div className="bg-[#161b22] shadow-sm rounded-xl border border-gray-800 overflow-hidden">
           
           {/* ================= TOP SECTION: Identity ================= */}
-          <div className="p-6 sm:p-8 border-b  border-gray-100 flex flex-col sm:flex-row items-center sm:items-start gap-6">
+          <div className="p-6 sm:p-8 border-b border-gray-800 flex flex-col sm:flex-row items-center sm:items-start gap-6">
             
             {/* Avatar Circle */}
             <div className="shrink-0 relative">
@@ -110,13 +110,13 @@ export default function ProfilePage() {
 
             {/* Name & Email Display */}
             <div className="text-center sm:text-left flex-1">
-              <h2 className="text-2xl font-bold text-gray-900">{user.name}</h2>
+              <h2 className="text-2xl font-bold text-white">{user.name}</h2>
               <p className="text-gray-500 flex items-center justify-center sm:justify-start gap-1.5 mt-1">
                 <Mail size={14} /> {user.email}
               </p>
               <div className="mt-4 flex flex-wrap justify-center sm:justify-start gap-2">
                 
-                <span className="px-3 py-1 bg-gray-100 text-gray-600 text-xs font-semibold rounded-full border border-gray-200">
+                <span className="px-3 py-1 bg-gray-800 text-gray-400 text-xs font-semibold rounded-full border border-gray-700">
                   Joined 2026
                 </span>
               </div>
@@ -129,30 +129,30 @@ export default function ProfilePage() {
             {/* Read-Only Fields */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                  <User size={16} className="text-gray-400" /> Full Name
+                <label className="text-sm font-medium text-gray-400 flex items-center gap-2">
+                  <User size={16} className="text-gray-500" /> Full Name
                 </label>
-                <div className="p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-600 cursor-not-allowed select-none">
+                <div className="p-3 bg-gray-900 border border-gray-800 rounded-lg text-gray-300 cursor-not-allowed select-none">
                   {user.name}
                 </div>
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                  <Mail size={16} className="text-gray-400" /> Email Address
+                <label className="text-sm font-medium text-gray-400 flex items-center gap-2">
+                  <Mail size={16} className="text-gray-500" /> Email Address
                 </label>
-                <div className="p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-600 cursor-not-allowed select-none">
+                <div className="p-3 bg-gray-900 border border-gray-800 rounded-lg text-gray-300 cursor-not-allowed select-none">
                   {user.email}
                 </div>
               </div>
             </div>
 
-            <hr className="border-gray-100" />
+            <hr className="border-gray-800" />
 
             {/* Password Section */}
             <div>
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                <h3 className="text-lg font-semibold text-white flex items-center gap-2">
                   <Key size={20} className="text-indigo-600" />
                   Password
                 </h3>
@@ -168,12 +168,12 @@ export default function ProfilePage() {
 
               {!isChangingPassword ? (
                 // Static View
-                <div className="p-4 bg-gray-50 rounded-lg border border-gray-200 flex items-center justify-between">
+                <div className="p-4 bg-gray-900 rounded-lg border border-gray-800 flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 bg-white rounded-md border border-gray-200">
+                    <div className="p-2 bg-gray-800 rounded-md border border-gray-700">
                       <Lock size={18} className="text-gray-400" />
                     </div>
-                    <span className="text-gray-600 font-mono tracking-widest text-lg">
+                    <span className="text-gray-400 font-mono tracking-widest text-lg">
                       ••••••••••••
                     </span>
                   </div>
@@ -181,12 +181,12 @@ export default function ProfilePage() {
                 </div>
               ) : (
                 // Editing View
-                <form onSubmit={handleSavePassword} className="bg-gray-50 p-6 rounded-xl border border-gray-200 animate-in fade-in slide-in-from-top-2">
+                <form onSubmit={handleSavePassword} className="bg-gray-900 p-6 rounded-xl border border-gray-800 animate-in fade-in slide-in-from-top-2">
                   <div className="space-y-4">
                     
                     {/* Current Password */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-gray-400 mb-1">
                         Current Password
                       </label>
                       <input
@@ -194,7 +194,7 @@ export default function ProfilePage() {
                         name="current"
                         value={passwordForm.current}
                         onChange={handlePasswordChange}
-                        className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+                        className="w-full px-4 py-2 bg-gray-800 text-white rounded-lg border border-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all placeholder:text-gray-600"
                         placeholder="Enter current password"
                         required
                       />
@@ -203,7 +203,7 @@ export default function ProfilePage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {/* New Password */}
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-medium text-gray-400 mb-1">
                           New Password
                         </label>
                         <input
@@ -211,7 +211,7 @@ export default function ProfilePage() {
                           name="new"
                           value={passwordForm.new}
                           onChange={handlePasswordChange}
-                          className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+                          className="w-full px-4 py-2 bg-gray-800 text-white rounded-lg border border-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all placeholder:text-gray-600"
                           placeholder="Min 6 chars"
                           required
                         />
@@ -219,7 +219,7 @@ export default function ProfilePage() {
 
                       {/* Confirm Password */}
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-medium text-gray-400 mb-1">
                           Confirm New Password
                         </label>
                         <input
@@ -227,7 +227,7 @@ export default function ProfilePage() {
                           name="confirm"
                           value={passwordForm.confirm}
                           onChange={handlePasswordChange}
-                          className={`w-full px-4 py-2 rounded-lg border focus:ring-2 outline-none transition-all ${
+                          className={`w-full px-4 py-2 bg-gray-800 text-white rounded-lg border focus:ring-2 outline-none transition-all placeholder:text-gray-600 ${
                              passwordForm.confirm && passwordForm.new !== passwordForm.confirm
                               ? "border-red-300 focus:ring-red-200 focus:border-red-400"
                               : "border-gray-300 focus:ring-indigo-500 focus:border-indigo-500"
