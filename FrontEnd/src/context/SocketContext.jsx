@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useRef } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
 
 const SocketContext = createContext();
@@ -8,22 +8,19 @@ export const useSocket = () => {
 };
 
 export const SocketProvider = ({ children }) => {
-    const socket = useRef(null);
-
-    if (!socket.current) {
-        socket.current = io("http://localhost:5000"); // Initialize once
-    }
+    const [socket, setSocket] = useState(null);
 
     useEffect(() => {
+        const url = import.meta.env.VITE_ENV === "production" ? "https://projectx-o5ae.onrender.com" : "http://localhost:5003";
+        const newSocket = io(url); // Initialize once
+        setSocket(newSocket);
         return () => {
-            if (socket.current) {
-                socket.current.disconnect();
-            }
+            newSocket.disconnect();
         };
     }, []);
 
     return (
-        <SocketContext.Provider value={socket.current}>
+        <SocketContext.Provider value={socket}>
             {children}
         </SocketContext.Provider>
     );

@@ -36,18 +36,12 @@ export const registerUser = createAsyncThunk(
 );
 export const googleLogin = createAsyncThunk(
   "auth/googleLogin",
-  async (token, thunkAPI) => {
+  async (token, { rejectWithValue }) => {
     try {
-      const res = await fetch("/auth/google", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token })
-      });
-
-      return await res.json();
-    // eslint-disable-next-line no-unused-vars
+      const res = await api.post("/auth/google", { token });
+      return res.data.accessToken;
     } catch (err) {
-      return thunkAPI.rejectWithValue("Google login failed");
+      return rejectWithValue(err.response?.data?.message || "Google login failed");
     }
   }
 );
@@ -91,9 +85,9 @@ const authSlice = createSlice({
       })
       .addCase(googleLogin.fulfilled, (state, action) => {
         state.loading = false;
-        state.token = action.payload.token;
+        state.token = action.payload;
         state.isAuthenticated = true;
-        localStorage.setItem("token", action.payload.token);
+        localStorage.setItem("token", action.payload);
       })
       .addCase(googleLogin.rejected, (state, action) => {
         state.loading = false;

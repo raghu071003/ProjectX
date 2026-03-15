@@ -114,4 +114,42 @@ const createSubmission = async (userId, data) => {
 
 
 
-export { createSubmission };
+const runSubmission = async (data) => {
+  let execution = null;
+  let verdict = null;
+
+  const problem = await Problem.findOne({
+    problemId: data.problemId,
+  });
+
+  if (!problem) {
+    throw new Error("Problem not found");
+  }
+
+  if (data.sourceCode && data.language) {
+    const judgeResult = await evaluateSubmission({
+      sourceCode: data.sourceCode,
+      language: data.language,
+      problem,
+    });
+
+    execution = {
+      success: judgeResult.success,
+      error: judgeResult.error || null,
+      summary: judgeResult.summary || null,
+      testCases: judgeResult.testCases || [],
+      hiddenTestFailed: judgeResult.hiddenTestFailed || false,
+    };
+
+    verdict = judgeResult.success
+      ? "Accepted"
+      : judgeResult.error || "Rejected";
+  }
+
+  return {
+    verdict,
+    execution,
+  };
+};
+
+export { createSubmission, runSubmission };

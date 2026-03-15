@@ -2,11 +2,15 @@ import { Router } from "express";
 import { register, login } from "../controllers/auth.controller.js";
 import User from "../models/User.js";
 import { OAuth2Client } from "google-auth-library";
-import jwt from "jsonwebtoken";
+import { generateAccessToken, generateRefreshToken } from "../utils/token.js";
+import initializeUserSkills from "../services/skillInit.service.js";
+
 const router = Router();
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
 router.post("/register", register);
 router.post("/login", login);
+
 router.post("/google", async (req, res) => {
   const { token } = req.body; // Google ID token
 
@@ -28,20 +32,29 @@ router.post("/google", async (req, res) => {
         name,
         googleId,
         avatar: picture,
-        provider: "google"
+        provider: "google" // Indicates they signed up with Google
       });
+      // Initialize default skills for new users
+      await initializeUserSkills(user._id);
+    } else if (!user.googleId) {
+      // If user exists but hasn't linked Google account, link it
+      user.googleId = googleId;
+      user.avatar = user.avatar || picture;
+      user.provider = "google";
+      await user.save();
     }
 
-    // Issue your own JWT
-    const appToken = jwt.sign(
-      { userId: user._id },
-      process.env.JWT_SECRET,
-      { expiresIn: "7d" }
-    );
+    // Generate standard tokens used by our app
+    const accessToken = generateAccessToken(user);
+    const refreshToken = generateRefreshToken(user);
 
-    res.json({ token: appToken });
+    user.refreshToken = refreshToken;
+    await user.save();
+
+    res.json({ user, accessToken, refreshToken });
   } catch (err) {
-    res.status(401).json({ error: "Invalid Google token" });
+    console.error("Google Auth Error:", err);
+    res.status(401).json({ message: "Invalid Google token" });
   }
 });
 
