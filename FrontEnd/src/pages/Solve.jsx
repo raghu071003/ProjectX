@@ -5,7 +5,7 @@ import { useParams, useLocation, useSearchParams } from "react-router-dom";
 import { Play, Clock, BarChart2, CheckCircle, AlertCircle } from "lucide-react"; 
 import { useSocket } from "../context/SocketContext";
 
-import { submitCode } from "../store/slices/submissionSlice";
+import { submitCode, testCode } from "../store/slices/submissionSlice";
 import { fetchProblem } from "../store/slices/problemSlice";
 
 import CodeEditor from "../components/CodeEditor";
@@ -51,7 +51,7 @@ export default function Solve() {
 
 
   const problem = useSelector((state) => state.problem);
-  const { result, loading } = useSelector((state) => state.submission);
+  const { result, loading, runResult, runLoading } = useSelector((state) => state.submission);
 
   const currProblem = problem.current;
   const socket = useSocket();
@@ -172,6 +172,20 @@ export default function Solve() {
       }),
     );
   };
+
+  /* 4️⃣ Run test code */
+  const handleTestCode = () => {
+    if (!problem || !code.trim()) return;
+
+    dispatch(
+      testCode({
+        problemId: currProblem.problemId,
+        language,
+        sourceCode: code,
+      }),
+    );
+  };
+
   const resetCode = () => {
     const starterCode = currProblem.starterCode?.[language] || "";
     if (roomId && socket) {
@@ -284,6 +298,8 @@ export default function Solve() {
               setLanguage={setLanguage}
               onRun={runCode}
               loading={loading}
+              onTestRun={handleTestCode}
+              runLoading={runLoading}
               starterCode={currProblem?.starterCode}
               onAnalyze={handleAnalyze}
               analyzing={analyzing}
@@ -313,9 +329,9 @@ export default function Solve() {
 
         {/* Output / Results Panel */}
         <div className="h-auto max-h-[40%] flex-shrink-0 flex flex-col p-4 gap-4 overflow-y-auto">
-          {(result || loading) && (
+          {(result || loading || runResult || runLoading) && (
             <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
-              {/* Mastery Feedback */}
+              {/* Mastery Feedback (Only on Submit) */}
               {result?.updatedSkill && (
                 <div className="bg-indigo-600 text-white p-4 rounded-lg shadow-md flex justify-between items-center">
                   <div>
@@ -334,34 +350,34 @@ export default function Solve() {
               {/* Console Output */}
               <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
                 <div className="bg-gray-50 px-4 py-2 border-b border-gray-200 text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                  Execution Result
+                  Execution Result {runResult || runLoading ? "(Test Run)" : ""}
                 </div>
-                {result?.verdict && (
+                {(result?.verdict || runResult?.verdict) && (
                   <div
                     className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold ${
-                      result.verdict === "Accepted"
+                      (result?.verdict || runResult?.verdict) === "Accepted"
                         ? "bg-green-100 text-green-700"
                         : "bg-red-100 text-red-700"
                     }`}
                   >
-                    {result.verdict === "Accepted" ? (
+                    {(result?.verdict || runResult?.verdict) === "Accepted" ? (
                       <CheckCircle size={16} />
                     ) : (
                       <AlertCircle size={16} />
                     )}
-                    {result.verdict}
+                    {(result?.verdict || runResult?.verdict)}
                   </div>
                 )}
 
                 <div className="p-4">
-                  <ExecutionResult execution={result?.execution} />
+                  <ExecutionResult execution={(result || runResult)?.execution} />
                 </div>
               </div>
 
-              {/* Explanation */}
-              {result?.explanation && (
+              {/* Explanation (Only on Submit typically) */}
+              {(result || runResult)?.explanation && (
                 <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
-                  <ExplanationPanel explanation={result?.explanation} />
+                  <ExplanationPanel explanation={(result || runResult)?.explanation} />
                 </div>
               )}
             </div>
