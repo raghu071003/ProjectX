@@ -38,9 +38,12 @@ export const googleLogin = createAsyncThunk(
   "auth/googleLogin",
   async (token, { rejectWithValue }) => {
     try {
+      console.log("Attempting backend Google login...");
       const res = await api.post("/auth/google", { token });
+      console.log("Backend Google login successful");
       return res.data.accessToken;
     } catch (err) {
+      console.error("Backend Google login failed:", err.response?.data || err.message);
       return rejectWithValue(err.response?.data?.message || "Google login failed");
     }
   }

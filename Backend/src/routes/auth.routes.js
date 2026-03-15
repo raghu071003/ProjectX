@@ -12,9 +12,14 @@ router.post("/register", register);
 router.post("/login", login);
 
 router.post("/google", async (req, res) => {
-  const { token } = req.body; // Google ID token
+  const { token } = req.body;
+  console.log("Received Google Auth request");
 
   try {
+    if (!token) {
+      console.error("No token provided in request");
+      return res.status(400).json({ message: "No token provided" });
+    }
     const ticket = await client.verifyIdToken({
       idToken: token,
       audience: process.env.GOOGLE_CLIENT_ID

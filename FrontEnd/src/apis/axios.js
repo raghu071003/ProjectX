@@ -1,8 +1,9 @@
 import axios from "axios";
 console.log(import.meta.env.VITE_ENV)
 
-const url = import.meta.env.VITE_ENV === "production" ? "https://projectx-o5ae.onrender.com/api" : "http://localhost:5003/api"
-console.log(url)
+const isProduction = typeof window !== "undefined" && (window.location.hostname.includes("skill-forge-dsa") || !window.location.hostname.includes("localhost"));
+const url = isProduction ? "https://projectx-o5ae.onrender.com/api" : "http://localhost:5003/api"
+console.log("Using API URL:", url);
 const api = axios.create({
   baseURL: url
 });
