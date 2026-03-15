@@ -11,7 +11,9 @@ export const SocketProvider = ({ children }) => {
     const [socket, setSocket] = useState(null);
 
     useEffect(() => {
-        const url = import.meta.env.VITE_ENV === "production" ? "https://projectx-o5ae.onrender.com" : "http://localhost:5003";
+        const isProduction = typeof window !== "undefined" && (window.location.hostname.includes("skill-forge-dsa") || !window.location.hostname.includes("localhost"));
+        const url = isProduction ? "https://projectx-o5ae.onrender.com" : "http://localhost:5003";
+        console.log("Using Socket URL:", url);
         const newSocket = io(url); // Initialize once
         setSocket(newSocket);
         return () => {
