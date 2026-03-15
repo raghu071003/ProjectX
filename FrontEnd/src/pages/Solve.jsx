@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, useLocation, useSearchParams } from "react-router-dom";
 
-import { Play, Clock, BarChart2, CheckCircle, AlertCircle } from "lucide-react"; 
+import { Play, Clock, BarChart2, CheckCircle, AlertCircle } from "lucide-react";
 import { useSocket } from "../context/SocketContext";
 
 import { submitCode, testCode } from "../store/slices/submissionSlice";
@@ -25,7 +25,7 @@ export default function Solve() {
   const [language, setLanguage] = useState("javascript");
   const [code, setCode] = useState("");
   const [roomId, setRoomId] = useState("");
-  
+
   const [analyzing, setAnalyzing] = useState(false);
   const [aiFeedback, setAiFeedback] = useState(null);
   const [roomCount, setRoomCount] = useState(0);
@@ -60,6 +60,8 @@ export default function Solve() {
   const urlRoomId = searchParams.get("roomId");
 
   /* Socket Initialization & Event Listeners */
+  const [collaborators, setCollaborators] = useState([]);
+
   useEffect(() => {
     if (!socket) return;
 
@@ -68,10 +70,33 @@ export default function Solve() {
       setCode(newCode);
     };
 
-    socket.on("code_update", handleCodeUpdate);
+    const handleLanguageUpdate = (newLanguage) => {
+      isRemoteUpdate.current = true;
+      setLanguage(newLanguage);
+    };
 
-    socket.on("room_update", ({ count }) => {
+    socket.on("code_update", handleCodeUpdate);
+    socket.on("language_update", handleLanguageUpdate);
+
+    socket.on("room_update", ({ count, code: roomCode, language: roomLang, userJoined, userLeft }) => {
       setRoomCount(count);
+      if (roomCode !== undefined && roomCode !== "") {
+        isRemoteUpdate.current = true;
+        setCode(roomCode);
+      }
+      if (roomLang !== undefined) {
+        isRemoteUpdate.current = true;
+        setLanguage(roomLang);
+      }
+      
+      if (userJoined) {
+        setNotification(`User established link!`);
+        setTimeout(() => setNotification(null), 3000);
+      }
+      if (userLeft) {
+        setNotification(`A link was terminated.`);
+        setTimeout(() => setNotification(null), 3000);
+      }
     });
 
     socket.on("user_joined", () => {
@@ -89,6 +114,7 @@ export default function Solve() {
 
     return () => {
       socket.off("code_update", handleCodeUpdate);
+      socket.off("language_update", handleLanguageUpdate);
       socket.off("room_update");
       socket.off("user_joined");
       socket.off("join_error");
@@ -101,10 +127,10 @@ export default function Solve() {
 
     if (urlRoomId) {
       setRoomId(urlRoomId);
-      socket.emit("join_room", { 
-        roomId: urlRoomId, 
+      socket.emit("join_room", {
+        roomId: urlRoomId,
         userId: currentUser._id,
-        problemId: problemId 
+        problemId: problemId
       });
       console.log(`Auto-joining room ${urlRoomId} for problem ${problemId}`);
     } else {
@@ -141,6 +167,14 @@ export default function Solve() {
     setCode(newCode);
     if (roomId && !isRemoteUpdate.current && socket) {
       socket.emit("code_change", { roomId, code: newCode });
+    }
+    isRemoteUpdate.current = false;
+  };
+
+  const handleLanguageChange = (newLang) => {
+    setLanguage(newLang);
+    if (roomId && !isRemoteUpdate.current && socket) {
+      socket.emit("language_change", { roomId, language: newLang });
     }
     isRemoteUpdate.current = false;
   };
@@ -224,78 +258,86 @@ export default function Solve() {
 
 
   return (
-    // Main Container: Full viewport height, restricted scroll on body
-    <div className="flex flex-col lg:flex-row h-screen bg-gray-50 overflow-hidden font-sans text-slate-800">
+    // Main Container: Solid dark background for professional feel
+    <div className="flex flex-col lg:flex-row h-screen bg-[#0d1117] overflow-hidden font-sans text-gray-300">
+      
       {/* ================= LEFT PANEL: Problem Context ================= */}
-      <div className="w-full lg:w-5/12 h-full flex flex-col border-r border-gray-200 bg-white">
+      <div className="w-full lg:w-[450px] h-full flex flex-col border-r border-gray-800 bg-[#0d1117] shrink-0">
         {/* Header Section */}
-        <div className="p-6 border-b border-gray-100">
-          <h1 className="text-2xl font-bold text-gray-900 mb-3">
+        <div className="p-8 border-b border-gray-800/60 bg-[#161b22]/50 backdrop-blur-xl">
+          <div className="flex items-center gap-2 mb-4">
+             <div className="w-2 h-2 bg-indigo-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(99,102,241,0.6)]"></div>
+             <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">System Link Active</span>
+          </div>
+          <h1 className="text-3xl font-black text-white leading-tight mb-4 tracking-tight">
             {currProblem.title}
           </h1>
-          <p className="text-gray-600 leading-relaxed mb-8">Note : If you choose a language other than javascript, the boiler plate must be written by you.</p>
-          <div className="flex flex-wrap gap-3 text-sm">
+          
+          <div className="flex flex-wrap gap-2 text-[10px]">
             <span
-              className={`px-3 py-1 rounded-full font-medium ${
+              className={`px-3 py-1.5 rounded-lg font-black uppercase tracking-widest border ${
                 currProblem.difficulty === 1
-                  ? "bg-green-100 text-green-700"
+                  ? "bg-green-500/10 text-green-400 border-green-500/20"
                   : currProblem.difficulty === 2
-                    ? "bg-yellow-100 text-yellow-700"
-                    : "bg-red-100 text-red-700"
+                    ? "bg-yellow-500/10 text-yellow-500 border-yellow-500/20"
+                    : "bg-red-500/10 text-red-500 border-red-500/20"
               }`}
             >
               {currProblem.difficulty === 1
-                ? "Easy"
+                ? "Level: Alpha"
                 : currProblem.difficulty === 2
-                  ? "Medium"
-                  : "Hard"}
+                  ? "Level: Beta"
+                  : "Level: Gamma"}
             </span>
-            <span className="flex items-center gap-1 text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
-              <Clock size={14} /> Estimated Duration :{" "}
+            <span className="flex items-center gap-2 text-gray-400 bg-gray-800/50 border border-gray-700/50 px-3 py-1.5 rounded-lg uppercase tracking-widest font-bold">
+              <Clock size={12} className="text-indigo-400" />
               {currProblem.estimatedTime}s
             </span>
           </div>
         </div>
 
         {/* Scrollable Content Area */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6">
-          {/* Description (If available in your data, add it here) */}
-          <div className="prose prose-slate max-w-none">
-            <p className="text-gray-600 leading-relaxed">
-              {/* Fallback description text if not in currProblem */}
-              {currProblem.description}
-            </p>
+        <div className="flex-1 overflow-y-auto p-8 space-y-10 custom-scrollbar">
+          {/* Description */}
+          <div className="space-y-4">
+            <h3 className="text-xs font-black text-indigo-400 uppercase tracking-[0.2em] flex items-center gap-2">
+               <span className="w-4 h-[1px] bg-indigo-500/40"></span> Objective
+            </h3>
+            <div className="prose prose-invert prose-sm max-w-none text-gray-400 leading-relaxed font-medium">
+              <p>{currProblem.description}</p>
+            </div>
           </div>
 
           {/* Test Cases */}
           {currProblem?.testCases && (
-            <div className="space-y-3">
-              <h3 className="font-semibold text-gray-700 flex items-center gap-2">
-                <CheckCircle size={18} className="text-blue-500" />
-                Test Cases
+            <div className="space-y-4">
+              <h3 className="text-xs font-black text-indigo-400 uppercase tracking-[0.2em] flex items-center gap-2">
+                <span className="w-4 h-[1px] bg-indigo-500/40"></span> Verification Gates
               </h3>
-              <div className="bg-slate-50 rounded-lg p-1 border border-gray-200">
+              <div className="bg-[#161b22] rounded-2xl p-2 border border-gray-800 shadow-inner">
                 <TestCasesPanel testCases={currProblem.testCases} />
               </div>
             </div>
           )}
         </div>
+
+        {/* Footer Note */}
+        <div className="p-6 bg-[#161b22]/30 border-t border-gray-800 text-[10px] text-gray-600 font-bold uppercase tracking-tight text-center">
+            Cross-language synchronization enabled
+        </div>
       </div>
 
       {/* ================= RIGHT PANEL: Workspace ================= */}
-      <div className="w-full lg:w-7/12 h-full flex flex-col bg-gray-50">
-        {/* Editor Container 
-            min-h-0 is crucial here: it allows the flex item to shrink below its content size, 
-            triggering the scrollbar on the child instead of expanding the page. 
-        */}
-        <div className="flex-1 flex flex-col p-4 pb-4 min-h-0 bg-gray-50">
+      <div className="flex-1 h-full flex flex-col bg-[#0d1117] relative">
+        {/* Editor Container */}
+        <div className="flex-1 flex flex-col p-6 min-h-0">
           <div className="flex-1 relative flex flex-col overflow-hidden">
             <CodeEditor
               resetCode={resetCode}
               code={code}
               setCode={handleCodeChange}
               language={language}
-              setLanguage={setLanguage}
+              setLanguage={handleLanguageChange}
               onRun={runCode}
               loading={loading}
               onTestRun={handleTestCode}
@@ -308,16 +350,21 @@ export default function Solve() {
                onLeaveRoom={handleLeaveRoom}
                roomCount={roomCount}
             />
+            
+            {/* Real-time Link Notification */}
             {notification && (
-              <div className="absolute top-4 right-4 z-[100] animate-in fade-in slide-in-from-top-4 duration-300">
-                <div className="bg-gray-800/95 backdrop-blur-md border border-indigo-500/30 text-white px-5 py-3 rounded-xl shadow-[0_8px_32px_rgba(0,0,0,0.4)] flex items-center gap-3">
-                  <div className="w-2 h-2 bg-indigo-500 rounded-full animate-ping"></div>
-                  <span className="text-sm font-medium">{notification}</span>
+              <div className="absolute top-6 right-6 z-[100] animate-in fade-in slide-in-from-top-6 duration-500">
+                <div className="bg-[#161b22]/95 backdrop-blur-2xl border border-indigo-500/30 text-white px-6 py-4 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex items-center gap-4">
+                  <div className="w-3 h-3 bg-indigo-500 rounded-full animate-ping"></div>
+                  <div className="flex flex-col">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-indigo-400">System Alert</span>
+                    <span className="text-sm font-bold text-gray-200">{notification}</span>
+                  </div>
                   <button 
                     onClick={() => setNotification(null)}
-                    className="ml-2 text-gray-400 hover:text-white transition-colors"
+                    className="ml-4 w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-gray-500 hover:text-white transition-all border border-transparent hover:border-gray-700"
                   >
-                    <AlertCircle size={14} />
+                    <X size={14} />
                   </button>
                 </div>
               </div>
@@ -327,62 +374,62 @@ export default function Solve() {
           </div>
         </div>
 
-        {/* Output / Results Panel */}
-        <div className="h-auto max-h-[40%] flex-shrink-0 flex flex-col p-4 gap-4 overflow-y-auto">
-          {(result || loading || runResult || runLoading) && (
-            <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
-              {/* Mastery Feedback (Only on Submit) */}
-              {result?.updatedSkill && (
-                <div className="bg-indigo-600 text-white p-4 rounded-lg shadow-md flex justify-between items-center">
-                  <div>
-                    <p className="text-xs opacity-90 uppercase tracking-wider font-semibold">
-                      Skill Mastery
-                    </p>
+        {/* Output / Results Panel - Floating style */}
+        {(result || loading || runResult || runLoading) && (
+          <div className="absolute bottom-10 left-10 right-10 z-40 max-h-[40%] flex-shrink-0 flex flex-col pointer-events-none">
+            <div className="w-full bg-[#161b22]/90 backdrop-blur-xl rounded-3xl border border-gray-800 shadow-[0_30px_60px_rgba(0,0,0,0.6)] overflow-hidden pointer-events-auto animate-in fade-in slide-in-from-bottom-8 duration-700">
+                {/* Console Header */}
+                <div className="flex items-center justify-between px-6 py-4 border-b border-gray-800 bg-gray-900/50">
+                   <div className="flex items-center gap-3">
+                      <div className="w-2.5 h-2.5 rounded-full bg-red-500"></div>
+                      <div className="w-2.5 h-2.5 rounded-full bg-yellow-500"></div>
+                      <div className="w-2.5 h-2.5 rounded-full bg-green-500"></div>
+                      <span className="ml-4 text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">Terminal Output</span>
+                   </div>
+                   {(result || runResult) && (
+                      <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${
+                        (result?.verdict || runResult?.verdict) === "Accepted"
+                          ? "bg-green-500/10 text-green-400 border border-green-500/20"
+                          : "bg-red-500/10 text-red-500 border border-red-500/20"
+                      }`}>
+                         {(result?.verdict || runResult?.verdict) === "Accepted" ? <CheckCircle size={12} /> : <AlertCircle size={12} />}
+                         {(result?.verdict || runResult?.verdict)}
+                      </div>
+                   )}
+                </div>
 
-                    <p className="text-lg font-bold">
-                      {(result.updatedSkill.mastery * 100).toFixed(1)}%
-                    </p>
+                <div className="p-8 max-h-[300px] overflow-y-auto custom-scrollbar bg-black/20">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                     <div className="space-y-6">
+                        <ExecutionResult execution={(result || runResult)?.execution} />
+                        {result?.updatedSkill && (
+                          <div className="p-4 rounded-2xl bg-indigo-600/10 border border-indigo-500/20 flex items-center justify-between group transition-all hover:bg-indigo-600/20">
+                            <div>
+                              <p className="text-[10px] text-indigo-400 uppercase tracking-widest font-black mb-1">Skill Progress</p>
+                              <p className="text-2xl font-black text-white">{(result.updatedSkill.mastery * 100).toFixed(1)}%</p>
+                            </div>
+                            <BarChart2 size={32} className="text-indigo-500 opacity-50 group-hover:opacity-100 transition-opacity" />
+                          </div>
+                        )}
+                     </div>
+                     
+                     <div className="border-l border-gray-800 pl-8">
+                        {(result || runResult)?.explanation ? (
+                           <div className="h-full">
+                              <ExplanationPanel explanation={(result || runResult)?.explanation} />
+                           </div>
+                        ) : (
+                           <div className="flex flex-col items-center justify-center h-48 opacity-20 text-center">
+                              <Sparkles size={48} className="mb-4 text-gray-600" />
+                              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-600">Awaiting Neural Analysis</p>
+                           </div>
+                        )}
+                     </div>
                   </div>
-                  <BarChart2 size={24} className="opacity-80" />
                 </div>
-              )}
-
-              {/* Console Output */}
-              <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
-                <div className="bg-gray-50 px-4 py-2 border-b border-gray-200 text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                  Execution Result {runResult || runLoading ? "(Test Run)" : ""}
-                </div>
-                {(result?.verdict || runResult?.verdict) && (
-                  <div
-                    className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold ${
-                      (result?.verdict || runResult?.verdict) === "Accepted"
-                        ? "bg-green-100 text-green-700"
-                        : "bg-red-100 text-red-700"
-                    }`}
-                  >
-                    {(result?.verdict || runResult?.verdict) === "Accepted" ? (
-                      <CheckCircle size={16} />
-                    ) : (
-                      <AlertCircle size={16} />
-                    )}
-                    {(result?.verdict || runResult?.verdict)}
-                  </div>
-                )}
-
-                <div className="p-4">
-                  <ExecutionResult execution={(result || runResult)?.execution} />
-                </div>
-              </div>
-
-              {/* Explanation (Only on Submit typically) */}
-              {(result || runResult)?.explanation && (
-                <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
-                  <ExplanationPanel explanation={(result || runResult)?.explanation} />
-                </div>
-              )}
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );

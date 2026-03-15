@@ -35,6 +35,10 @@ const collaborationSchema = new mongoose.Schema({
     type: String,
     default: ""
   },
+  language: {
+    type: String,
+    default: "javascript"
+  },
   createdAt: {
     type: Date,
     default: Date.now
