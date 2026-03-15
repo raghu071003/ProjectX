@@ -7,126 +7,124 @@ import SkillTrendChart from "../components/SkillTrendChart";
 import { useNavigate } from "react-router-dom";
 import { fetchProblemsBySkill } from "../store/slices/problemSlice";
 import ProblemListModal from "../components/ProblemsList";
+import LiveStats from "../components/LiveStats";
+import { Rocket, Trophy, Target, Sparkles } from "lucide-react";
 
-// const SkillTrendChart = ({ data }) => {
-//   if (!data) return null;
-  
-//   return (
-//     <div className="bg-gray-800 border border-gray-700 rounded-xl p-6">
-//       <h3 className="text-white font-semibold text-lg mb-4">Skill Trend</h3>
-//       <div className="h-64 flex items-end justify-between space-x-2">
-//         {data.map((point, idx) => (
-//           <div key={idx} className="flex-1 flex flex-col items-center">
-//             <div className="w-full bg-gray-900 rounded-t-lg relative group cursor-pointer">
-//               <div
-//                 className="bg-gradient-to-t from-indigo-600 to-purple-600 rounded-t-lg transition-all duration-300 hover:from-indigo-500 hover:to-purple-500"
-//                 style={{ height: `${point.value * 2}px` }}
-//               ></div>
-//               <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-900 border border-gray-700 rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition whitespace-nowrap">
-//                 <span className="text-white text-xs font-medium">{point.value}%</span>
-//               </div>
-//             </div>
-//             <span className="text-gray-500 text-xs mt-2">{point.date}</span>
-//           </div>
-//         ))}
-//       </div>
-//     </div>
-//   );
-// };
 export default function Dashboard() {
   const dispatch = useDispatch();
   const skills = useSelector((state) => state.skills.list);
   const recommendation = useSelector((state) => state.recommendation.data);
-  // eslint-disable-next-line no-unused-vars
   const loadingRecommendation = useSelector((state) => state.recommendation.loadingRecommendation);
-  // eslint-disable-next-line no-unused-vars
-  const trends = useSelector((s) => s.skills.trends);
-  const problem = useSelector((s)=>s.problem)
-   const [isModalOpen, setIsModalOpen] = useState(false);
+  const problem = useSelector((s)=>s.problem);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
+
   useEffect(() => {
     dispatch(fetchSkills());
     dispatch(fetchRecommendation());
   }, [dispatch]);
-  // eslint-disable-next-line no-unused-vars
+
   const [selectedSkill, setSelectedSkill] = useState(null);
   const selectSkill = (skillKey) => {
     dispatch(fetchProblemsBySkill(skillKey));
-    setIsModalOpen(true)
+    setIsModalOpen(true);
     setSelectedSkill(skillKey);
     dispatch(fetchSkillTrend(skillKey));
-    
   };
-  // console.log(loadingRecommendation);
-   return (
-    <div className="min-h-screen bg-gray-900 py-8">
-      <div className="p-6 space-y-6 max-w-6xl mx-auto">
+
+  return (
+    <div className="min-h-screen bg-[#0d1117] py-12 px-6 overflow-x-hidden">
+      <div className="max-w-7xl mx-auto space-y-10">
         
-        {
+        {/* Header Section */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-gray-800">
+          <div>
+            <h1 className="text-4xl font-black text-white tracking-tight flex items-center gap-3">
+              Engineer Console <Sparkles className="text-indigo-500 animate-pulse" size={24} />
+            </h1>
+            <p className="text-gray-500 font-medium mt-1">Master your skills through collaborative real-time challenges.</p>
+          </div>
+          <div className="flex items-center gap-4">
+             <div className="px-4 py-2 bg-indigo-500/10 rounded-xl border border-indigo-500/20">
+                <span className="text-[10px] font-black uppercase tracking-widest text-indigo-400 block">Current Rank</span>
+                <span className="text-white font-bold">Standard Cadet</span>
+             </div>
+          </div>
+        </div>
 
-        recommendation && (
-          <div className="p-6 rounded-xl bg-indigo-600 border border-indigo-500/50 relative overflow-hidden">
-            <div className="absolute inset-0 bg-grid-white/[0.05] bg-[size:20px_20px]"></div>
-            <div className="relative">
-              <div className="flex items-center mb-3">
-                <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center mr-3">
-                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
-                </div>
-                <h2 className="font-semibold text-xl text-white">Recommended Next</h2>
+        {/* Real-time Stats */}
+        <LiveStats />
+        
+        {/* Recommendation Hero */}
+        {recommendation && (
+          <div className="group relative transition-all duration-500">
+            <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-3xl blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
+            <div className="relative p-8 rounded-3xl bg-[#161b22] border border-gray-800 flex flex-col md:flex-row items-center gap-8 overflow-hidden shadow-2xl">
+              <div className="absolute top-0 right-0 p-12 -mr-12 -mt-12 bg-indigo-500/10 rounded-full blur-3xl"></div>
+              
+              <div className="w-20 h-20 bg-indigo-500/10 rounded-2xl flex items-center justify-center shrink-0 border border-indigo-500/20 group-hover:scale-110 transition-transform duration-500">
+                <Rocket className="w-10 h-10 text-indigo-400 group-hover:animate-bounce" />
               </div>
-              <p className="mt-2 text-white font-medium text-lg">{recommendation.problem.title}</p>
-              <p className="text-sm text-indigo-100 mt-1">{recommendation.reason}</p>
-              {recommendation.explanation && (
-                <p className="text-sm text-indigo-100 mt-1 italic">"{recommendation.explanation}"</p>
-              )}
+              
+              <div className="flex-1 text-center md:text-left">
+                <div className="flex items-center justify-center md:justify-start gap-2 mb-2">
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-400">Mission Recommended</span>
+                  <div className="h-[1px] w-8 bg-indigo-500/40"></div>
+                </div>
+                <h2 className="text-2xl font-black text-white group-hover:text-indigo-400 transition-colors uppercase tracking-tight">
+                  {recommendation.problem.title}
+                </h2>
+                <p className="text-gray-400 mt-2 text-sm leading-relaxed max-w-2xl">
+                  {recommendation.reason} {recommendation.explanation && <span className="italic text-gray-500">— "{recommendation.explanation}"</span>}
+                </p>
+              </div>
 
-              <button className="mt-4 bg-white/20 hover:bg-white/30 text-white px-6 py-2 rounded-lg font-medium transition" onClick={()=>navigate('/solve/'+recommendation.problem.problemId)}>
-                Start Problem
+              <button 
+                className="group/btn relative inline-flex items-center justify-center px-8 py-4 font-black text-xs uppercase tracking-widest text-white transition-all duration-300 ease-in-out bg-indigo-600 rounded-2xl hover:bg-indigo-500 shadow-xl shadow-indigo-500/20 active:scale-95 shrink-0"
+                onClick={() => navigate('/solve/' + recommendation.problem.problemId)}
+              >
+                Engage Target <ChevronRight className="ml-2 group-hover/btn:translate-x-1 transition-transform" size={16} />
               </button>
             </div>
           </div>
         )}
 
-        {/* {selectedSkill && <SkillTrendChart data={trends[selectedSkill]} />} */}
+        {/* Modals & Popups */}
         <ProblemListModal 
-        isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
-        problems={problem.problemsList} 
-      />
+          isOpen={isModalOpen} 
+          onClose={() => setIsModalOpen(false)} 
+          problems={problem.problemsList} 
+        />
 
-        {/* Skills */}
-        <div>
-          {skills.length === 0 && (
-            <div className="p-8 border border-gray-700 rounded-xl bg-gray-800 text-center">
-              <div className="w-16 h-16 bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
+        {/* Skills Section */}
+        <div className="space-y-8 pt-6">
+          <div className="flex items-center gap-3">
+             <Trophy className="text-yellow-500" size={24} />
+             <h2 className="text-2xl font-black text-white tracking-tight uppercase">Skill Matrix</h2>
+          </div>
+
+          {skills.length === 0 ? (
+            <div className="p-16 border-2 border-dashed border-gray-800 rounded-3xl bg-[#161b22]/50 text-center group transition-colors hover:border-indigo-500/30">
+              <div className="w-20 h-20 bg-gray-800/50 rounded-3xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
+                <Target className="w-10 h-10 text-gray-600" />
               </div>
-              <p className="text-gray-400 text-lg">
-                You haven't started practicing yet. Solve a problem to begin tracking your skills.
+              <h3 className="text-white text-xl font-bold mb-2">Neural Link Inactive</h3>
+              <p className="text-gray-500 max-w-sm mx-auto mb-8">
+                You haven't initiated any training protocols. Complete a challenge to begin mapping your engineering capabilities.
               </p>
-              <button className="mt-4 bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-2 rounded-lg font-medium transition">
-                Browse Problems
+              <button className="bg-white text-black px-8 py-3 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-gray-200 transition active:scale-95 shadow-xl">
+                Initiate First Mission
               </button>
             </div>
-          )}
-
-          {skills.length > 0 && (
-            <>
-              <h2 className="text-2xl font-bold mb-6 text-white">Skill Progress</h2>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {skills.map((skill) => (
-                  <SkillCard key={skill.key} skill={skill} onSelect={selectSkill} />
-                ))}
-              </div>
-            </>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {skills.map((skill) => (
+                <SkillCard key={skill.key} skill={skill} onSelect={selectSkill} />
+              ))}
+            </div>
           )}
         </div>
       </div>
     </div>
   );
-};
+}
