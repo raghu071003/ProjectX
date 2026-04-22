@@ -7,8 +7,7 @@ export default function AICoachPanel({ feedback, onClose }) {
 
   return (
     <div className="bg-white border-t border-gray-200 shadow-xl fixed bottom-0 left-0 right-0 z-50 max-h-[50vh] overflow-y-auto lg:relative lg:max-h-full lg:shadow-none animate-in slide-in-from-bottom-5 w-full">
-      <div className="p-4 bg-indigo-600 text-white flex justify-between items-center sticky top-0 z-10">
-
+      <div className="p-4 bg-gradient-to-r from-purple-700 to-indigo-800 text-white flex justify-between items-center sticky top-0 z-10">
         <div className="flex items-center gap-2">
           <Star className="text-yellow-400 fill-yellow-400" size={20} />
           <h3 className="font-bold text-lg">AI Code Coach</h3>
@@ -74,8 +73,7 @@ export default function AICoachPanel({ feedback, onClose }) {
             {suggestions.map((suggestion, idx) => (
               <li key={idx} className="flex gap-3 text-sm bg-gray-50 p-3 rounded-lg border border-gray-100">
                 <AlertTriangle className="text-gray-400 flex-shrink-0 mt-0.5" size={16} />
-                
-                  <span className="text-gray-600">   {suggestion}</span>
+                  <span className="text-gray-600">{suggestion}</span>
                 
               </li>
             ))}

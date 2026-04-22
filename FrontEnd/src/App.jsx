@@ -13,12 +13,14 @@ import ProfilePage from "./pages/Profile.jsx";
 import { SocketProvider } from "./context/SocketContext";
 import GlobalBroadcast from "./components/GlobalBroadcast";
 import Broadcasts from "./pages/Broadcasts.jsx";
+import TitleManager from "./components/TitleManager.jsx";
 
 export default function App() {
   return (
     <SocketProvider>
       <BrowserRouter>
         <Navbar />
+        <TitleManager />
         <GlobalBroadcast />
         <Routes>
           <Route path="/" element={<HomePage />} />
