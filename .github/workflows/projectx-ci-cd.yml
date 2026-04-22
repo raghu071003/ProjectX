@@ -1,0 +1,60 @@
+name: ProjectX CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  # This job builds and deploys the React/Vite frontend to Firebase Hosting
+  frontend-deploy:
+    name: Build and Deploy Frontend (Firebase)
+    runs-on: ubuntu-latest
+    # We only want to deploy when code is pushed/merged to the main branch
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: './FrontEnd/package-lock.json'
+
+      - name: Install dependencies and build
+        run: |
+          npm ci
+          npm run build
+        working-directory: ./FrontEnd
+
+      - name: Deploy to Firebase Hosting
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: '${{ secrets.GITHUB_TOKEN }}'
+          # NOTE: You must generate a Firebase service account and add it as a GitHub Secret 
+          # named FIREBASE_SERVICE_ACCOUNT_SKILL_FORGE_DSA
+          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_SKILL_FORGE_DSA }}'
+          projectId: skill-forge-dsa
+          channelId: live
+          entryPoint: ./FrontEnd
+
+  # This job triggers the backend deployment on Render
+  backend-deploy:
+    name: Deploy Backend (Render)
+    runs-on: ubuntu-latest
+    # We only want to deploy when code is pushed/merged to the main branch
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - name: Trigger Render Deploy Hook
+        run: |
+          # NOTE: You must add RENDER_DEPLOY_HOOK_URL to your GitHub repository secrets.
+          # You can find this URL in your Render Dashboard -> Backend Service -> Settings -> Deploy Hook
+          if [ -z "${{ secrets.RENDER_DEPLOY_HOOK_URL }}" ]; then
+            echo "Error: RENDER_DEPLOY_HOOK_URL secret is not set!"
+            exit 1
+          fi
+          echo "Triggering Render deployment..."
+          curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"

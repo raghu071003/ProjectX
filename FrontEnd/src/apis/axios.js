@@ -1,5 +1,5 @@
 import axios from "axios";
-console.log(import.meta.env.VITE_ENV)
+
 
 const isProduction = typeof window !== "undefined" && (window.location.hostname.includes("skill-forge-dsa") || !window.location.hostname.includes("localhost"));
 const url = isProduction ? "https://projectx-o5ae.onrender.com/api" : "http://localhost:5003/api"

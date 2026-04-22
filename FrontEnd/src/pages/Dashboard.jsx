@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { fetchProblemsBySkill } from "../store/slices/problemSlice";
 import ProblemListModal from "../components/ProblemsList";
 import LiveStats from "../components/LiveStats";
-import { Rocket, Trophy, Target, Sparkles } from "lucide-react";
+import { Rocket, Trophy, Target, Sparkles, ChevronRight } from "lucide-react";
 
 export default function Dashboard() {
   const dispatch = useDispatch();
