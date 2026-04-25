@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, useLocation, useSearchParams } from "react-router-dom";
 
-import { Play, Clock, BarChart2, CheckCircle, AlertCircle } from "lucide-react";
+import { Play, Clock, BarChart2, CheckCircle, AlertCircle, Sparkles } from "lucide-react";
 import { useSocket } from "../context/SocketContext";
 
 import { submitCode, testCode } from "../store/slices/submissionSlice";
