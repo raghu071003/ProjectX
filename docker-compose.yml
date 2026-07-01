@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./Backend
+      dockerfile: Dockerfile
+    container_name: projectx-backend
+    ports:
+      - "5001:5001"
+    env_file:
+      - ./Backend/.env
+    environment:
+      - PORT=5001
+    networks:
+      - projectx-network
+    restart: always
+
+  frontend:
+    build:
+      context: ./FrontEnd
+      dockerfile: Dockerfile
+      args:
+        # These will be passed to the Vite build process
+        - VITE_GOOGLE_CLIENT_ID=${VITE_GOOGLE_CLIENT_ID}
+        - VITE_ENV=${VITE_ENV:-production}
+    container_name: projectx-frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - projectx-network
+    restart: always
+
+networks:
+  projectx-network:
+    driver: bridge

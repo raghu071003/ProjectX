@@ -123,7 +123,7 @@ export default function CodeEditor({
 
         {/* Action Controls */}
         <div className="flex items-center gap-3">
-          <div className="flex items-center bg-gray-900/50 rounded-xl border border-gray-800 px-1 py-1 mr-2 scale-90 md:scale-100">
+          {/* <div className="flex items-center bg-gray-900/50 rounded-xl border border-gray-800 px-1 py-1 mr-2 scale-90 md:scale-100">
             {['javascript', 'python', 'java', 'cpp'].map((lang) => (
               <button
                 key={lang}
@@ -137,7 +137,7 @@ export default function CodeEditor({
                 {lang === 'javascript' ? 'JS' : lang === 'python' ? 'PY' : lang === 'java' ? 'JV' : lang}
               </button>
             ))}
-          </div>
+          </div> */}
 
           <button 
             onClick={resetCode}

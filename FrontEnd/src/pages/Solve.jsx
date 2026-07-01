@@ -304,7 +304,7 @@ export default function Solve() {
                <span className="w-4 h-[1px] bg-indigo-500/40"></span> Objective
             </h3>
             <div className="prose prose-invert prose-sm max-w-none text-gray-400 leading-relaxed font-medium">
-              <p>{currProblem.description}</p>
+              <p>{currProblem?.description || "No description available"}</p>
             </div>
           </div>
 

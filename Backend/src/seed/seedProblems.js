@@ -2,7 +2,7 @@ import Problem from "../models/Problem.js";
 
 const problems = [
   // ================= ARRAYS =================
-  
+
   {
     problemId: "two_sum",
     title: "Two Sum",
@@ -18,13 +18,13 @@ const problems = [
     },
     testCases: [
       {
-        input: JSON.stringify({ nums: [2,7,11,15], target: 9 }),
+        input: JSON.stringify({ nums: [2, 7, 11, 15], target: 9 }),
         expectedOutput: "[0,1]"
       },
       {
-        input: JSON.stringify({ nums: [3,2,4], target: 6 }),
+        input: JSON.stringify({ nums: [3, 2, 4], target: 6 }),
         expectedOutput: "[1,2]",
-        isHidden: true  
+        isHidden: true
       }
     ]
   },
@@ -200,18 +200,18 @@ const problems = [
     },
     testCases: [
       {
-        input: JSON.stringify({ nums: [1,2,3,4,5,6,7], k: 3 }),
+        input: JSON.stringify({ nums: [1, 2, 3, 4, 5, 6, 7], k: 3 }),
         expectedOutput: "[5,6,7,1,2,3,4]"
       },
       {
-        input: JSON.stringify({ nums: [-1,-100,3,99], k: 2 }),
+        input: JSON.stringify({ nums: [-1, -100, 3, 99], k: 2 }),
         expectedOutput: "[3,99,-1,-100]",
         isHidden: true
       }
     ]
   }
-,
-{
+  ,
+  {
     problemId: "contains_duplicate",
     title: "Contains Duplicate",
     description: "Return true if any value appears at least twice in the array.",
@@ -297,7 +297,7 @@ const problems = [
     },
     testCases: [
       {
-        input: JSON.stringify({ nums: [1,1,1,2,2,3], k: 2 }),
+        input: JSON.stringify({ nums: [1, 1, 1, 2, 2, 3], k: 2 }),
         expectedOutput: "[1,2]"
       },
       {
@@ -323,11 +323,11 @@ const problems = [
     },
     testCases: [
       {
-        input: JSON.stringify({ numbers: [2,7,11,15], target: 9 }),
+        input: JSON.stringify({ numbers: [2, 7, 11, 15], target: 9 }),
         expectedOutput: "[1,2]"
       },
       {
-        input: JSON.stringify({ numbers: [2,3,4], target: 6 }),
+        input: JSON.stringify({ numbers: [2, 3, 4], target: 6 }),
         expectedOutput: "[1,3]",
         isHidden: true
       }
@@ -375,11 +375,11 @@ const problems = [
     },
     testCases: [
       {
-        input: JSON.stringify({ nums: [1,1,1], k: 2 }),
+        input: JSON.stringify({ nums: [1, 1, 1], k: 2 }),
         expectedOutput: "2"
       },
       {
-        input: JSON.stringify({ nums: [1,2,3], k: 3 }),
+        input: JSON.stringify({ nums: [1, 2, 3], k: 3 }),
         expectedOutput: "2",
         isHidden: true
       }
@@ -447,11 +447,11 @@ const problems = [
     },
     testCases: [
       {
-        input: JSON.stringify({ numbers: [2,7,11,15], target: 9 }),
+        input: JSON.stringify({ numbers: [2, 7, 11, 15], target: 9 }),
         expectedOutput: "[1,2]"
       },
       {
-        input: JSON.stringify({ numbers: [2,3,4], target: 6 }),
+        input: JSON.stringify({ numbers: [2, 3, 4], target: 6 }),
         expectedOutput: "[1,3]",
         isHidden: true
       }
@@ -492,11 +492,11 @@ const problems = [
     },
     testCases: [
       {
-        input: JSON.stringify({ nums: [3,2,2,3], val: 3 }),
+        input: JSON.stringify({ nums: [3, 2, 2, 3], val: 3 }),
         expectedOutput: "2"
       },
       {
-        input: JSON.stringify({ nums: [0,1,2,2,3,0,4,2], val: 2 }),
+        input: JSON.stringify({ nums: [0, 1, 2, 2, 3, 0, 4, 2], val: 2 }),
         expectedOutput: "5",
         isHidden: true
       }
@@ -634,8 +634,8 @@ const problems = [
 }`
     },
     testCases: [
-      { input: JSON.stringify({ nums: [2,1,5,1,3,2], k: 3 }), expectedOutput: "9" },
-      { input: JSON.stringify({ nums: [2,3,4,1,5], k: 2 }), expectedOutput: "7", isHidden: true }
+      { input: JSON.stringify({ nums: [2, 1, 5, 1, 3, 2], k: 3 }), expectedOutput: "9" },
+      { input: JSON.stringify({ nums: [2, 3, 4, 1, 5], k: 2 }), expectedOutput: "7", isHidden: true }
     ]
   },
 
@@ -748,8 +748,8 @@ const problems = [
 }`
     },
     testCases: [
-      { input: JSON.stringify({ nums: [1,2,1,2,3], k: 2 }), expectedOutput: "7" },
-      { input: JSON.stringify({ nums: [1,2,1,3,4], k: 3 }), expectedOutput: "3", isHidden: true }
+      { input: JSON.stringify({ nums: [1, 2, 1, 2, 3], k: 2 }), expectedOutput: "7" },
+      { input: JSON.stringify({ nums: [1, 2, 1, 3, 4], k: 3 }), expectedOutput: "3", isHidden: true }
     ]
   },
   // ================= STRINGS =================
@@ -811,7 +811,7 @@ const problems = [
   },
 
   // ================= SORTING =================
-   {
+  {
     problemId: "sort_colors",
     title: "Sort Colors",
     description: "Sort an array containing 0s, 1s, and 2s in-place (Dutch National Flag problem).",
@@ -844,13 +844,13 @@ const problems = [
 }`
     },
     testCases: [
-      { input: JSON.stringify({ nums: [3,2,1,5,6,4], k: 2 }), expectedOutput: "5" },
-      { input: JSON.stringify({ nums: [3,2,3,1,2,4,5,5,6], k: 4 }), expectedOutput: "4", isHidden: true }
+      { input: JSON.stringify({ nums: [3, 2, 1, 5, 6, 4], k: 2 }), expectedOutput: "5" },
+      { input: JSON.stringify({ nums: [3, 2, 3, 1, 2, 4, 5, 5, 6], k: 4 }), expectedOutput: "4", isHidden: true }
     ]
   },
 
   // ================= BINARY SEARCH =================
-   {
+  {
     problemId: "binary_search",
     title: "Binary Search",
     description: "Given a sorted array, return the index of target if found, otherwise -1.",
@@ -864,8 +864,8 @@ const problems = [
 }`
     },
     testCases: [
-      { input: JSON.stringify({ nums: [1,2,3,4,5,6], target: 4 }), expectedOutput: "3" },
-      { input: JSON.stringify({ nums: [1,2,3,4,5], target: 6 }), expectedOutput: "-1", isHidden: true }
+      { input: JSON.stringify({ nums: [1, 2, 3, 4, 5, 6], target: 4 }), expectedOutput: "3" },
+      { input: JSON.stringify({ nums: [1, 2, 3, 4, 5], target: 6 }), expectedOutput: "-1", isHidden: true }
     ]
   },
 
@@ -883,8 +883,8 @@ const problems = [
 }`
     },
     testCases: [
-      { input: JSON.stringify({ nums: [4,5,6,7,0,1,2], target: 0 }), expectedOutput: "4" },
-      { input: JSON.stringify({ nums: [4,5,6,7,0,1,2], target: 3 }), expectedOutput: "-1", isHidden: true }
+      { input: JSON.stringify({ nums: [4, 5, 6, 7, 0, 1, 2], target: 0 }), expectedOutput: "4" },
+      { input: JSON.stringify({ nums: [4, 5, 6, 7, 0, 1, 2], target: 3 }), expectedOutput: "-1", isHidden: true }
     ]
   },
 
@@ -968,7 +968,7 @@ function solve(input) {
   },
 
   // ================= QUEUE =================
-   {
+  {
     problemId: "implement_queue",
     title: "Implement Queue using Stacks",
     description: "Implement a queue using two stacks supporting push, pop, peek, and empty operations.",
@@ -1282,7 +1282,7 @@ function solve(input) {
   },
 
   // ================= BINARY TREE =================
-    {
+  {
     problemId: "level_order",
     title: "Binary Tree Level Order Traversal",
     description: "Return the level order traversal of a binary tree's nodes as a list of lists.",

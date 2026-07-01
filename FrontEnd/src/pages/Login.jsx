@@ -243,7 +243,7 @@ export default function Login() {
             Don't have an account?{" "}
             <button
               type="button"
-              onClick={() => { }}
+              onClick={() => window.location.href = "/register"}
               className="text-indigo-400 hover:text-indigo-300 font-semibold"
             >
               Sign up for free

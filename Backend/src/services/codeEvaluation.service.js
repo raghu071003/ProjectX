@@ -1,6 +1,6 @@
 import axios from "axios";
+import { localExecute } from "./localExecution.service.js";
 
-const PISTON_URL = "https://emkc.org/api/v2/piston/execute";
 
 const normalize = (output) =>
   output.trim().replace(/\s+/g, " ");
@@ -170,23 +170,13 @@ int main() {
 
     let response;
     try {
-      response = await axios.post(
-        PISTON_URL,
-        {
-          language: language === "cpp" ? "c++" : language,
-          version: "*",
-          files: [{ content: wrappedCode }],
-          stdin: testCase.input,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-        }
-      );
+      response = await localExecute({
+        language: language === "cpp" ? "c++" : language,
+        code: wrappedCode,
+        stdin: testCase.input,
+      });
     } catch (err) {
-      console.log(err)
+      console.log(err);
       return {
         success: false,
         error: "Judge Error",
